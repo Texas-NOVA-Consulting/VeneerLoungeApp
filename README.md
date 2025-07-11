@@ -1,5 +1,5 @@
 # 🦷 VeneerVision AI
-
+# Note: AWS Placeholder files present, code content hidden to prevent plagiarism
 **VeneerVision AI** is a full-stack web application that uses AI to simulate dental veneers on smile images. Built with a React frontend and Express backend, powered by the Replicate API, it enables users to upload or capture a smile photo, select veneer shades, and view AI-generated previews. Designed for both patients and dentists, it features a quiz, lead capture, PDF reports, and a "Dentist Mode" for advanced simulations.
 
 ---
