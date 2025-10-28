@@ -52,6 +52,7 @@ class ResNetEncoder(nn.Module):
 
 class DecoderBlock(nn.Module):
     """Decoder block for upsampling and feature fusion"""
+    
     def __init__(self, in_channels, out_channels, skip_channels):
         super().__init__()
         self.upsample = nn.ConvTranspose2d(
@@ -68,12 +69,14 @@ class DecoderBlock(nn.Module):
         )
 
     def forward(self, x, skip):
+        # make feature map bigger
         x = self.upsample(x)
         
         # Handles size mismatch
         if x.shape != skip.shape:
             x = F.interpolate(x, size=skip.shape[2:], mode='bilinear', align_corners=True)
         
+        # combine features from skip connection and upsampled features
         x = torch.cat([x, skip], dim=1)
         x = self.conv(x)
         return x
@@ -107,6 +110,37 @@ class AttentionBlock(nn.Module):
         psi = self.relu(g1 + x1)
         psi = self.psi(psi)
         return x * psi
+
+class ToothSegmentationNet(nn.Module):
+
+    def __init__(self):
+        super().__init__()
+        self.encoder = ResNetEncoder()
+        self.decoder1 = DecoderBlock(2048, 1024, 512)
+        self.decoder2 = DecoderBlock(1024, 512, 256)
+        self.decoder3 = DecoderBlock(512, 256, 128)
+        self.decoder4 = DecoderBlock(256, 128, 64)
+
+        self.final_upsample = nn.ConvTranspose2d(64,32, 2, stride=2)
+        self.final_conv = nn.Sequential(
+            nn.Conv2d(32, 32, 3, padding=1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(32, out_channels, 1)
+        )
+
+    def forward(self, x):
+        features = self.encoder(x)
+
+        d4 = self.decoder4(features[4], features[3])
+        d3 = self.decoder3(d4, features[2])
+        d2 = self.decoder2(d3, features[1])
+        d1 = self.decoder1(d2, features[0])
+
+        out = self.final_upsample(d1)
+        out = self.final_conv(out)
+        
+        return torch.sigmoid(out)
 
 
     
