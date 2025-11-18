@@ -1,0 +1,15 @@
+DEFAULT:
+  ROOT: "."
+  DEVICE: 'cpu'
+DATA:
+  DIR: "dataset/kaggle_batch1"
+  EXT:
+    - "png"
+    - "jpg"
+    - "jpeg"
+    - "jfif"
+MODEL:
+  WEIGHTS: "checkpoints/CP_teeth_seg.pth"
+EVAL:
+  DIR: "outputs/kaggle_batch1"
+RESIZE: True

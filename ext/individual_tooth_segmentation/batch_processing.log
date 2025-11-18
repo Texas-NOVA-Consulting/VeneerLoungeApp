@@ -1,0 +1,761 @@
+=== Moving next batch of 10 images to active ===
+Queued: 00209.jpg
+Queued: 00212.jpg
+Queued: 00213.jpg
+Queued: 00214.jpg
+Queued: 00215.jpg
+Queued: 00216.jpg
+Queued: 00217.jpg
+Queued: 00219.jpg
+Queued: 00220.jpg
+Queued: 00221.jpg
+=== Processing batch... ===
+Created a directory ./outputs/kaggle_batch1/25-11-16/00219/
+[251116-18:58:06] Image 219, initiating...
+[251116-18:58:06] Step1: Obtaining pseudo edge-region...
+[251116-18:58:06] + Using main device <cpu>
+[251116-18:58:09] + Model is loaded from ./checkpoints/CP_teeth_seg.pth
+[251116-18:58:15] Step2: Refining pre-edge region...
+[251116-18:58:20] + Expanding contours to boundary of the pseudo edge-region...................................................../tmp/batch_loop_fixed.sh: line 31: 69437 Segmentation fault: 11  /Users/joshuawu/VeneerLoungeApp/venv/bin/python main.py --ALL --cfg config/kaggle_batch1.yaml
+=== Moving processed images ===
+Completed: 00202.jpg
+Completed: 00203.jpg
+Completed: 00204.jpg
+Completed: 00205.jpg
+Completed: 00206.jpg
+Completed: 00207.jpg
+Completed: 00208.jpg
+Completed: 00209.jpg
+Completed: 00210.jpg
+Completed: 00211.jpg
+Completed: 00212.jpg
+Completed: 00213.jpg
+Completed: 00214.jpg
+Completed: 00215.jpg
+Completed: 00216.jpg
+Completed: 00217.jpg
+Completed: 00219.jpg
+Completed: 00220.jpg
+Completed: 00221.jpg
+=== Batch complete. Remaining:      220 ===
+
+=== Moving next batch of 10 images to active ===
+Queued: 00222.jpg
+Queued: 00223.jpg
+Queued: 00225.jpg
+Queued: 00226.jpg
+Queued: 00227.jpg
+Queued: 00228.jpg
+Queued: 00229.jpg
+Queued: 00230.jpg
+Queued: 00231.jpg
+Queued: 00232.jpg
+=== Processing batch... ===
+Created a directory ./outputs/kaggle_batch1/25-11-16/00227/
+[251116-18:58:55] Image 227, initiating...
+[251116-18:58:55] Step1: Obtaining pseudo edge-region...
+[251116-18:58:56] + Using main device <cpu>
+[251116-18:58:59] + Model is loaded from ./checkpoints/CP_teeth_seg.pth
+[251116-18:59:04] Step2: Refining pre-edge region...
+[251116-18:59:06] + Expanding contours to boundary of the pseudo edge-region............................................................../tmp/batch_loop_fixed.sh: line 31: 70146 Killed: 9               /Users/joshuawu/VeneerLoungeApp/venv/bin/python main.py --ALL --cfg config/kaggle_batch1.yaml
+=== Moving processed images ===
+Completed: 00222.jpg
+Completed: 00223.jpg
+Completed: 00225.jpg
+Completed: 00226.jpg
+Completed: 00227.jpg
+Completed: 00228.jpg
+Completed: 00229.jpg
+Completed: 00230.jpg
+Completed: 00231.jpg
+Completed: 00232.jpg
+=== Batch complete. Remaining:      210 ===
+
+=== Moving next batch of 10 images to active ===
+Queued: 00233.jpg
+Queued: 00234.jpg
+Queued: 00235.jpg
+Queued: 00236.jpg
+Queued: 00237.jpg
+Queued: 00238.jpg
+Queued: 00239.jpg
+Queued: 00240.jpg
+Queued: 00241.jpg
+Queued: 00242.jpg
+=== Processing batch... ===
+Created a directory ./outputs/kaggle_batch1/25-11-16/00242/
+[251116-19:03:57] Image 242, initiating...
+[251116-19:03:57] Step1: Obtaining pseudo edge-region...
+[251116-19:03:58] + Using main device <cpu>
+[251116-19:04:02] + Model is loaded from ./checkpoints/CP_teeth_seg.pth
+[251116-19:04:08] Step2: Refining pre-edge region...
+[251116-19:04:11] + Expanding contours to boundary of the pseudo edge-region..................................................../tmp/batch_loop_fixed.sh: line 31: 73919 Segmentation fault: 11  /Users/joshuawu/VeneerLoungeApp/venv/bin/python main.py --ALL --cfg config/kaggle_batch1.yaml
+=== Moving processed images ===
+Completed: 00233.jpg
+Completed: 00234.jpg
+Completed: 00235.jpg
+Completed: 00236.jpg
+Completed: 00237.jpg
+Completed: 00238.jpg
+Completed: 00239.jpg
+Completed: 00240.jpg
+Completed: 00241.jpg
+Completed: 00242.jpg
+=== Batch complete. Remaining:      200 ===
+
+=== Moving next batch of 10 images to active ===
+Queued: 00243.jpg
+Queued: 00244.jpg
+Queued: 00245.jpg
+Queued: 00246.jpg
+Queued: 00247.jpg
+Queued: 00248.jpg
+Queued: 00249.jpg
+Queued: 00250.jpg
+Queued: 00251.jpg
+Queued: 00252.jpg
+=== Processing batch... ===
+Created a directory ./outputs/kaggle_batch1/25-11-16/00244/
+[251116-19:04:35] Image 244, initiating...
+[251116-19:04:35] Step1: Obtaining pseudo edge-region...
+[251116-19:04:36] + Using main device <cpu>
+[251116-19:04:39] + Model is loaded from ./checkpoints/CP_teeth_seg.pth
+[251116-19:04:45] Step2: Refining pre-edge region...
+[251116-19:04:48] + Expanding contours to boundary of the pseudo edge-region..................................................../tmp/batch_loop_fixed.sh: line 31: 74514 Segmentation fault: 11  /Users/joshuawu/VeneerLoungeApp/venv/bin/python main.py --ALL --cfg config/kaggle_batch1.yaml
+=== Moving processed images ===
+Completed: 00243.jpg
+Completed: 00244.jpg
+Completed: 00245.jpg
+Completed: 00246.jpg
+Completed: 00247.jpg
+Completed: 00248.jpg
+Completed: 00249.jpg
+Completed: 00250.jpg
+Completed: 00251.jpg
+Completed: 00252.jpg
+=== Batch complete. Remaining:      190 ===
+
+=== Moving next batch of 10 images to active ===
+Queued: 00253.jpg
+Queued: 00254.jpg
+Queued: 00255.jpg
+Queued: 00256.jpg
+Queued: 00257.jpg
+Queued: 00258.jpg
+Queued: 00259.jpg
+Queued: 00260.jpg
+Queued: 00261.jpg
+Queued: 00262.jpg
+=== Processing batch... ===
+Created a directory ./outputs/kaggle_batch1/25-11-16/00253/
+[251116-19:05:17] Image 253, initiating...
+[251116-19:05:17] Step1: Obtaining pseudo edge-region...
+[251116-19:05:17] + Using main device <cpu>
+[251116-19:05:20] + Model is loaded from ./checkpoints/CP_teeth_seg.pth
+[251116-19:06:29] Step2: Refining pre-edge region...
+[251116-19:06:32] + Expanding contours to boundary of the pseudo edge-region....................................................Traceback (most recent call last):
+  File "/Users/joshuawu/VeneerLoungeApp/ext/individual_tooth_segmentation/main.py", line 67, in <module>
+    if args.inits: ts.initContour()
+                   ^^^^^^^^^^^^^^^^
+  File "/Users/joshuawu/VeneerLoungeApp/ext/individual_tooth_segmentation/src/makeup.py", line 66, in initContour
+    initC = InitContour(img, per0)
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joshuawu/VeneerLoungeApp/ext/individual_tooth_segmentation/src/teethSeg.py", line 154, in __init__
+    phi_init = self.evolve(phi_sep, self.per, dt=.3, mu=2, nu=1, reinterm=3, tol=2, max_iter=100)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joshuawu/VeneerLoungeApp/ext/individual_tooth_segmentation/src/teethSeg.py", line 213, in evolve
+    phi = self.rein_w5_fmm.getSDF(np.where(phi < 0, -1., 1.))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joshuawu/VeneerLoungeApp/ext/individual_tooth_segmentation/src/reinitial.py", line 62, in getSDF
+    phi[..., i] = skfmm.distance(img[..., i], dx=1)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/joshuawu/VeneerLoungeApp/venv/lib/python3.11/site-packages/skfmm/pfmm.py", line 110, in distance
+    d = cFastMarcher(phi, dx, flag, None, ext_mask,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: the array phi contains no zero contour (no zero level set)
+=== Moving processed images ===
+Completed: 00253.jpg
+Completed: 00254.jpg
+Completed: 00255.jpg
+Completed: 00256.jpg
+Completed: 00257.jpg
+Completed: 00258.jpg
+Completed: 00259.jpg
+Completed: 00260.jpg
+Completed: 00261.jpg
+Completed: 00262.jpg
+=== Batch complete. Remaining:      180 ===
+
+=== Moving next batch of 10 images to active ===
+Queued: 00263.jpg
+Queued: 00264.jpg
+Queued: 00265.jpg
+Queued: 00266.jpg
+Queued: 00267.jpg
+Queued: 00268.jpg
+Queued: 00269.jpg
+Queued: 00270.jpg
+Queued: 00271.jpg
+Queued: 00272.jpg
+=== Processing batch... ===
+Created a directory ./outputs/kaggle_batch1/25-11-16/00269/
+[251116-19:07:05] Image 269, initiating...
+[251116-19:07:05] Step1: Obtaining pseudo edge-region...
+[251116-19:07:06] + Using main device <cpu>
+[251116-19:07:08] + Model is loaded from ./checkpoints/CP_teeth_seg.pth
+[251116-19:07:11] Step2: Refining pre-edge region...
+[251116-19:07:14] + Expanding contours to boundary of the pseudo edge-region............................................................../tmp/batch_loop_fixed.sh: line 31: 76393 Killed: 9               /Users/joshuawu/VeneerLoungeApp/venv/bin/python main.py --ALL --cfg config/kaggle_batch1.yaml
+=== Moving processed images ===
+Completed: 00263.jpg
+Completed: 00264.jpg
+Completed: 00265.jpg
+Completed: 00266.jpg
+Completed: 00267.jpg
+Completed: 00268.jpg
+Completed: 00269.jpg
+Completed: 00270.jpg
+Completed: 00271.jpg
+Completed: 00272.jpg
+=== Batch complete. Remaining:      170 ===
+
+=== Moving next batch of 10 images to active ===
+Queued: 00273.jpg
+Queued: 00274.jpg
+Queued: 00275.jpg
+Queued: 00276.jpg
+Queued: 00277.jpg
+Queued: 00278.jpg
+Queued: 00279.jpg
+Queued: 00280.jpg
+Queued: 00281.jpg
+Queued: 00282.jpg
+=== Processing batch... ===
+Created a directory ./outputs/kaggle_batch1/25-11-16/00278/
+[251116-19:12:29] Image 278, initiating...
+[251116-19:12:29] Step1: Obtaining pseudo edge-region...
+[251116-19:12:29] + Using main device <cpu>
+[251116-19:12:33] + Model is loaded from ./checkpoints/CP_teeth_seg.pth
+[251116-19:13:31] Step2: Refining pre-edge region...
+[251116-19:13:34] + Expanding contours to boundary of the pseudo edge-region..................................................../tmp/batch_loop_fixed.sh: line 31: 80400 Segmentation fault: 11  /Users/joshuawu/VeneerLoungeApp/venv/bin/python main.py --ALL --cfg config/kaggle_batch1.yaml
+=== Moving processed images ===
+Completed: 00273.jpg
+Completed: 00274.jpg
+Completed: 00275.jpg
+Completed: 00276.jpg
+Completed: 00277.jpg
+Completed: 00278.jpg
+Completed: 00279.jpg
+Completed: 00280.jpg
+Completed: 00281.jpg
+Completed: 00282.jpg
+=== Batch complete. Remaining:      160 ===
+
+=== Moving next batch of 10 images to active ===
+Queued: 00283.jpg
+Queued: 00284.jpg
+Queued: 00285.jpg
+Queued: 00286.jpg
+Queued: 00287.jpg
+Queued: 00288.jpg
+Queued: 00289.jpg
+Queued: 00290.jpg
+Queued: 00291.jpg
+Queued: 00292.jpg
+=== Processing batch... ===
+Created a directory ./outputs/kaggle_batch1/25-11-16/00287/
+[251116-19:14:25] Image 287, initiating...
+[251116-19:14:25] Step1: Obtaining pseudo edge-region...
+[251116-19:14:26] + Using main device <cpu>
+[251116-19:14:29] + Model is loaded from ./checkpoints/CP_teeth_seg.pth
+[251116-19:14:40] Step2: Refining pre-edge region...
+[251116-19:14:44] + Expanding contours to boundary of the pseudo edge-region..................................................../tmp/batch_loop_fixed.sh: line 31: 81870 Segmentation fault: 11  /Users/joshuawu/VeneerLoungeApp/venv/bin/python main.py --ALL --cfg config/kaggle_batch1.yaml
+=== Moving processed images ===
+Completed: 00283.jpg
+Completed: 00284.jpg
+Completed: 00285.jpg
+Completed: 00286.jpg
+Completed: 00287.jpg
+Completed: 00288.jpg
+Completed: 00289.jpg
+Completed: 00290.jpg
+Completed: 00291.jpg
+Completed: 00292.jpg
+=== Batch complete. Remaining:      150 ===
+
+=== Moving next batch of 10 images to active ===
+Queued: 00293.jpg
+Queued: 00294.jpg
+Queued: 00295.jpg
+Queued: 00296.jpg
+Queued: 00297.jpg
+Queued: 00298.jpg
+Queued: 00299.jpg
+Queued: 00300.jpg
+Queued: 00301.jpg
+Queued: 00302.jpg
+=== Processing batch... ===
+Created a directory ./outputs/kaggle_batch1/25-11-16/00293/
+[251116-19:15:41] Image 293, initiating...
+[251116-19:15:41] Step1: Obtaining pseudo edge-region...
+[251116-19:15:42] + Using main device <cpu>
+[251116-19:15:44] + Model is loaded from ./checkpoints/CP_teeth_seg.pth
+[251116-19:16:04] Step2: Refining pre-edge region...
+[251116-19:16:08] + Expanding contours to boundary of the pseudo edge-region...................................................../tmp/batch_loop_fixed.sh: line 31: 82776 Segmentation fault: 11  /Users/joshuawu/VeneerLoungeApp/venv/bin/python main.py --ALL --cfg config/kaggle_batch1.yaml
+=== Moving processed images ===
+Completed: 00293.jpg
+Completed: 00294.jpg
+Completed: 00295.jpg
+Completed: 00296.jpg
+Completed: 00297.jpg
+Completed: 00298.jpg
+Completed: 00299.jpg
+Completed: 00300.jpg
+Completed: 00301.jpg
+Completed: 00302.jpg
+=== Batch complete. Remaining:      140 ===
+
+=== Moving next batch of 10 images to active ===
+Queued: 00303.jpg
+Queued: 00304.jpg
+Queued: 00305.jpg
+Queued: 00306.jpg
+Queued: 00307.jpg
+Queued: 00308.jpg
+Queued: 00309.jpg
+Queued: 00310.jpg
+Queued: 00311.jpg
+Queued: 00312.jpg
+=== Processing batch... ===
+Created a directory ./outputs/kaggle_batch1/25-11-16/00309/
+[251116-19:16:31] Image 309, initiating...
+[251116-19:16:31] Step1: Obtaining pseudo edge-region...
+[251116-19:16:31] + Using main device <cpu>
+[251116-19:16:34] + Model is loaded from ./checkpoints/CP_teeth_seg.pth
+[251116-19:18:03] Step2: Refining pre-edge region...
+[251116-19:18:05] + Expanding contours to boundary of the pseudo edge-region..................................................../tmp/batch_loop_fixed.sh: line 31: 83423 Segmentation fault: 11  /Users/joshuawu/VeneerLoungeApp/venv/bin/python main.py --ALL --cfg config/kaggle_batch1.yaml
+=== Moving processed images ===
+Completed: 00303.jpg
+Completed: 00304.jpg
+Completed: 00305.jpg
+Completed: 00306.jpg
+Completed: 00307.jpg
+Completed: 00308.jpg
+Completed: 00309.jpg
+Completed: 00310.jpg
+Completed: 00311.jpg
+Completed: 00312.jpg
+=== Batch complete. Remaining:      130 ===
+
+=== Moving next batch of 10 images to active ===
+Queued: 00313.jpg
+Queued: 00314.jpg
+Queued: 00315.jpg
+Queued: 00316.jpg
+Queued: 00317.jpg
+Queued: 00318.jpg
+Queued: 00319.jpg
+Queued: 00320.jpg
+Queued: 00321.jpg
+Queued: 00322.jpg
+=== Processing batch... ===
+Created a directory ./outputs/kaggle_batch1/25-11-16/00318/
+[251116-19:18:30] Image 318, initiating...
+[251116-19:18:30] Step1: Obtaining pseudo edge-region...
+[251116-19:18:31] + Using main device <cpu>
+[251116-19:18:34] + Model is loaded from ./checkpoints/CP_teeth_seg.pth
+[251116-19:18:51] Step2: Refining pre-edge region...
+[251116-19:18:54] + Expanding contours to boundary of the pseudo edge-region..................................................../tmp/batch_loop_fixed.sh: line 31: 84903 Segmentation fault: 11  /Users/joshuawu/VeneerLoungeApp/venv/bin/python main.py --ALL --cfg config/kaggle_batch1.yaml
+=== Moving processed images ===
+Completed: 00313.jpg
+Completed: 00314.jpg
+Completed: 00315.jpg
+Completed: 00316.jpg
+Completed: 00317.jpg
+Completed: 00318.jpg
+Completed: 00319.jpg
+Completed: 00320.jpg
+Completed: 00321.jpg
+Completed: 00322.jpg
+=== Batch complete. Remaining:      120 ===
+
+=== Moving next batch of 10 images to active ===
+Queued: 00323.jpg
+Queued: 00324.jpg
+Queued: 00325.jpg
+Queued: 00326.jpg
+Queued: 00327.jpg
+Queued: 00328.jpg
+Queued: 00329.jpg
+Queued: 00330.jpg
+Queued: 00331.jpg
+Queued: 00332.jpg
+=== Processing batch... ===
+Created a directory ./outputs/kaggle_batch1/25-11-16/00330/
+[251116-19:19:16] Image 330, initiating...
+[251116-19:19:16] Step1: Obtaining pseudo edge-region...
+[251116-19:19:17] + Using main device <cpu>
+[251116-19:19:19] + Model is loaded from ./checkpoints/CP_teeth_seg.pth
+[251116-19:19:26] Step2: Refining pre-edge region...
+[251116-19:19:29] + Expanding contours to boundary of the pseudo edge-region...................................................../tmp/batch_loop_fixed.sh: line 31: 85462 Segmentation fault: 11  /Users/joshuawu/VeneerLoungeApp/venv/bin/python main.py --ALL --cfg config/kaggle_batch1.yaml
+=== Moving processed images ===
+Completed: 00323.jpg
+Completed: 00324.jpg
+Completed: 00325.jpg
+Completed: 00326.jpg
+Completed: 00327.jpg
+Completed: 00328.jpg
+Completed: 00329.jpg
+Completed: 00330.jpg
+Completed: 00331.jpg
+Completed: 00332.jpg
+=== Batch complete. Remaining:      110 ===
+
+=== Moving next batch of 10 images to active ===
+Queued: 00333.jpg
+Queued: 00334.jpg
+Queued: 00335.jpg
+Queued: 00336.jpg
+Queued: 00337.jpg
+Queued: 00338.jpg
+Queued: 00339.jpg
+Queued: 00340.jpg
+Queued: 00341.jpg
+Queued: 00342.jpg
+=== Processing batch... ===
+Created a directory ./outputs/kaggle_batch1/25-11-16/00333/
+[251116-19:19:49] Image 333, initiating...
+[251116-19:19:49] Step1: Obtaining pseudo edge-region...
+[251116-19:19:49] + Using main device <cpu>
+[251116-19:19:51] + Model is loaded from ./checkpoints/CP_teeth_seg.pth
+[251116-19:20:08] Step2: Refining pre-edge region...
+[251116-19:20:11] + Expanding contours to boundary of the pseudo edge-region..............................................................
+Traceback (most recent call last):
+  File "/Users/joshuawu/VeneerLoungeApp/ext/individual_tooth_segmentation/main.py", line 67, in <module>
+    if args.inits: ts.initContour()
+                   ^^^^^^^^^^^^^^^^
+  File "/Users/joshuawu/VeneerLoungeApp/ext/individual_tooth_segmentation/src/makeup.py", line 70, in initContour
+    initC.phi0 = self._resize(initC.phi0.transpose(1, 2, 0), restore=(m, n)).transpose(2, 0, 1)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: axes don't match array
+=== Moving processed images ===
+Completed: 00333.jpg
+Completed: 00334.jpg
+Completed: 00335.jpg
+Completed: 00336.jpg
+Completed: 00337.jpg
+Completed: 00338.jpg
+Completed: 00339.jpg
+Completed: 00340.jpg
+Completed: 00341.jpg
+Completed: 00342.jpg
+=== Batch complete. Remaining:      100 ===
+
+=== Moving next batch of 10 images to active ===
+Queued: 00343.jpg
+Queued: 00344.jpg
+Queued: 00345.jpg
+Queued: 00346.jpg
+Queued: 00347.jpg
+Queued: 00348.jpg
+Queued: 00349.jpg
+Queued: 00350.jpg
+Queued: 00351.jpg
+Queued: 00352.jpg
+=== Processing batch... ===
+Created a directory ./outputs/kaggle_batch1/25-11-16/00347/
+[251116-19:20:34] Image 347, initiating...
+[251116-19:20:34] Step1: Obtaining pseudo edge-region...
+[251116-19:20:35] + Using main device <cpu>
+[251116-19:20:36] + Model is loaded from ./checkpoints/CP_teeth_seg.pth
+[251116-19:20:54] Step2: Refining pre-edge region...
+[251116-19:20:57] + Expanding contours to boundary of the pseudo edge-region..................................................../tmp/batch_loop_fixed.sh: line 31: 86467 Segmentation fault: 11  /Users/joshuawu/VeneerLoungeApp/venv/bin/python main.py --ALL --cfg config/kaggle_batch1.yaml
+=== Moving processed images ===
+Completed: 00343.jpg
+Completed: 00344.jpg
+Completed: 00345.jpg
+Completed: 00346.jpg
+Completed: 00347.jpg
+Completed: 00348.jpg
+Completed: 00349.jpg
+Completed: 00350.jpg
+Completed: 00351.jpg
+Completed: 00352.jpg
+=== Batch complete. Remaining:       90 ===
+
+=== Moving next batch of 10 images to active ===
+Queued: 00353.jpg
+Queued: 00354.jpg
+Queued: 00355.jpg
+Queued: 00356.jpg
+Queued: 00357.jpg
+Queued: 00358.jpg
+Queued: 00359.jpg
+Queued: 00360.jpg
+Queued: 00361.jpg
+Queued: 00362.jpg
+=== Processing batch... ===
+Created a directory ./outputs/kaggle_batch1/25-11-16/00353/
+[251116-19:21:35] Image 353, initiating...
+[251116-19:21:35] Step1: Obtaining pseudo edge-region...
+[251116-19:21:35] + Using main device <cpu>
+[251116-19:21:38] + Model is loaded from ./checkpoints/CP_teeth_seg.pth
+[251116-19:21:58] Step2: Refining pre-edge region...
+[251116-19:22:04] + Expanding contours to boundary of the pseudo edge-region..................................................../tmp/batch_loop_fixed.sh: line 31: 87216 Segmentation fault: 11  /Users/joshuawu/VeneerLoungeApp/venv/bin/python main.py --ALL --cfg config/kaggle_batch1.yaml
+=== Moving processed images ===
+Completed: 00353.jpg
+Completed: 00354.jpg
+Completed: 00355.jpg
+Completed: 00356.jpg
+Completed: 00357.jpg
+Completed: 00358.jpg
+Completed: 00359.jpg
+Completed: 00360.jpg
+Completed: 00361.jpg
+Completed: 00362.jpg
+=== Batch complete. Remaining:       80 ===
+
+=== Moving next batch of 10 images to active ===
+Queued: 00363.jpg
+Queued: 00364.jpg
+Queued: 00365.jpg
+Queued: 00366.jpg
+Queued: 00367.jpg
+Queued: 00368.jpg
+Queued: 00369.jpg
+Queued: 00370.jpg
+Queued: 00371.jpg
+Queued: 00372.jpg
+=== Processing batch... ===
+Created a directory ./outputs/kaggle_batch1/25-11-16/00369/
+[251116-19:22:37] Image 369, initiating...
+[251116-19:22:37] Step1: Obtaining pseudo edge-region...
+[251116-19:22:37] + Using main device <cpu>
+[251116-19:22:39] + Model is loaded from ./checkpoints/CP_teeth_seg.pth
+[251116-19:22:57] Step2: Refining pre-edge region...
+[251116-19:23:00] + Expanding contours to boundary of the pseudo edge-region..................................................../tmp/batch_loop_fixed.sh: line 31: 87995 Segmentation fault: 11  /Users/joshuawu/VeneerLoungeApp/venv/bin/python main.py --ALL --cfg config/kaggle_batch1.yaml
+=== Moving processed images ===
+Completed: 00363.jpg
+Completed: 00364.jpg
+Completed: 00365.jpg
+Completed: 00366.jpg
+Completed: 00367.jpg
+Completed: 00368.jpg
+Completed: 00369.jpg
+Completed: 00370.jpg
+Completed: 00371.jpg
+Completed: 00372.jpg
+=== Batch complete. Remaining:       70 ===
+
+=== Moving next batch of 10 images to active ===
+Queued: 00373.jpg
+Queued: 00374.jpg
+Queued: 00375.jpg
+Queued: 00376.jpg
+Queued: 00377.jpg
+Queued: 00378.jpg
+Queued: 00379.jpg
+Queued: 00380.jpg
+Queued: 00381.jpg
+Queued: 00382.jpg
+=== Processing batch... ===
+Created a directory ./outputs/kaggle_batch1/25-11-16/00378/
+[251116-19:23:35] Image 378, initiating...
+[251116-19:23:35] Step1: Obtaining pseudo edge-region...
+[251116-19:23:36] + Using main device <cpu>
+[251116-19:23:38] + Model is loaded from ./checkpoints/CP_teeth_seg.pth
+[251116-19:23:53] Step2: Refining pre-edge region...
+[251116-19:23:56] + Expanding contours to boundary of the pseudo edge-region...................................................../tmp/batch_loop_fixed.sh: line 31: 88692 Segmentation fault: 11  /Users/joshuawu/VeneerLoungeApp/venv/bin/python main.py --ALL --cfg config/kaggle_batch1.yaml
+=== Moving processed images ===
+Completed: 00373.jpg
+Completed: 00374.jpg
+Completed: 00375.jpg
+Completed: 00376.jpg
+Completed: 00377.jpg
+Completed: 00378.jpg
+Completed: 00379.jpg
+Completed: 00380.jpg
+Completed: 00381.jpg
+Completed: 00382.jpg
+=== Batch complete. Remaining:       60 ===
+
+=== Moving next batch of 10 images to active ===
+Queued: 00383.jpg
+Queued: 00384.jpg
+Queued: 00385.jpg
+Queued: 00386.jpg
+Queued: 00387.jpg
+Queued: 00388.jpg
+Queued: 00389.jpg
+Queued: 00390.jpg
+Queued: 00391.jpg
+Queued: 00392.jpg
+=== Processing batch... ===
+Created a directory ./outputs/kaggle_batch1/25-11-16/00390/
+[251116-19:24:16] Image 390, initiating...
+[251116-19:24:16] Step1: Obtaining pseudo edge-region...
+[251116-19:24:17] + Using main device <cpu>
+[251116-19:24:19] + Model is loaded from ./checkpoints/CP_teeth_seg.pth
+[251116-19:25:04] Step2: Refining pre-edge region...
+[251116-19:25:06] + Expanding contours to boundary of the pseudo edge-region..................................................../tmp/batch_loop_fixed.sh: line 31: 89193 Segmentation fault: 11  /Users/joshuawu/VeneerLoungeApp/venv/bin/python main.py --ALL --cfg config/kaggle_batch1.yaml
+=== Moving processed images ===
+Completed: 00383.jpg
+Completed: 00384.jpg
+Completed: 00385.jpg
+Completed: 00386.jpg
+Completed: 00387.jpg
+Completed: 00388.jpg
+Completed: 00389.jpg
+Completed: 00390.jpg
+Completed: 00391.jpg
+Completed: 00392.jpg
+=== Batch complete. Remaining:       50 ===
+
+=== Moving next batch of 10 images to active ===
+Queued: 00393.jpg
+Queued: 00394.jpg
+Queued: 00395.jpg
+Queued: 00396.jpg
+Queued: 00397.jpg
+Queued: 00398.jpg
+Queued: 00399.jpg
+Queued: 00400.jpg
+Queued: 00401.jpg
+Queued: 00402.jpg
+=== Processing batch... ===
+/tmp/batch_loop_fixed.sh: line 31: 90168 Killed: 9               /Users/joshuawu/VeneerLoungeApp/venv/bin/python main.py --ALL --cfg config/kaggle_batch1.yaml
+=== Moving processed images ===
+Completed: 00393.jpg
+Completed: 00394.jpg
+Completed: 00395.jpg
+Completed: 00396.jpg
+Completed: 00397.jpg
+Completed: 00398.jpg
+Completed: 00399.jpg
+Completed: 00400.jpg
+Completed: 00401.jpg
+Completed: 00402.jpg
+=== Batch complete. Remaining:       40 ===
+
+=== Moving next batch of 10 images to active ===
+Queued: 00403.jpg
+Queued: 00404.jpg
+Queued: 00405.jpg
+Queued: 00406.jpg
+Queued: 00407.jpg
+Queued: 00408.jpg
+Queued: 00409.jpg
+Queued: 00410.jpg
+Queued: 00411.jpg
+Queued: 00412.jpg
+=== Processing batch... ===
+/tmp/batch_loop_fixed.sh: line 31: 93186 Killed: 9               /Users/joshuawu/VeneerLoungeApp/venv/bin/python main.py --ALL --cfg config/kaggle_batch1.yaml
+=== Moving processed images ===
+Completed: 00403.jpg
+Completed: 00404.jpg
+Completed: 00405.jpg
+Completed: 00406.jpg
+Completed: 00407.jpg
+Completed: 00408.jpg
+Completed: 00409.jpg
+Completed: 00410.jpg
+Completed: 00411.jpg
+Completed: 00412.jpg
+=== Batch complete. Remaining:       30 ===
+
+=== Moving next batch of 10 images to active ===
+Queued: 00413.jpg
+Queued: 00414.jpg
+Queued: 00415.jpg
+Queued: 00416.jpg
+Queued: 00418.jpg
+Queued: 00419.jpg
+Queued: 00422.jpg
+Queued: 00423.jpg
+Queued: 00424.jpg
+Queued: 00425.jpg
+=== Processing batch... ===
+Created a directory ./outputs/kaggle_batch1/25-11-16/00422/
+[251116-19:32:55] Image 422, initiating...
+[251116-19:32:55] Step1: Obtaining pseudo edge-region...
+[251116-19:32:56] + Using main device <cpu>
+[251116-19:32:59] + Model is loaded from ./checkpoints/CP_teeth_seg.pth
+[251116-19:33:18] Step2: Refining pre-edge region...
+[251116-19:33:21] + Expanding contours to boundary of the pseudo edge-region..................................................../tmp/batch_loop_fixed.sh: line 31: 95811 Segmentation fault: 11  /Users/joshuawu/VeneerLoungeApp/venv/bin/python main.py --ALL --cfg config/kaggle_batch1.yaml
+=== Moving processed images ===
+Completed: 00413.jpg
+Completed: 00414.jpg
+Completed: 00415.jpg
+Completed: 00416.jpg
+Completed: 00418.jpg
+Completed: 00419.jpg
+Completed: 00422.jpg
+Completed: 00423.jpg
+Completed: 00424.jpg
+Completed: 00425.jpg
+=== Batch complete. Remaining:       20 ===
+
+=== Moving next batch of 10 images to active ===
+Queued: 00426.jpg
+Queued: 00427.jpg
+Queued: 00428.jpg
+Queued: 00429.jpg
+Queued: 00430.jpg
+Queued: 00431.jpg
+Queued: 00432.jpg
+Queued: 00433.jpg
+Queued: 00434.jpg
+Queued: 00435.jpg
+=== Processing batch... ===
+Created a directory ./outputs/kaggle_batch1/25-11-16/00435/
+[251116-19:34:06] Image 435, initiating...
+[251116-19:34:06] Step1: Obtaining pseudo edge-region...
+[251116-19:34:07] + Using main device <cpu>
+[251116-19:34:10] + Model is loaded from ./checkpoints/CP_teeth_seg.pth
+[251116-19:34:28] Step2: Refining pre-edge region...
+[251116-19:34:30] + Expanding contours to boundary of the pseudo edge-region...................................................../tmp/batch_loop_fixed.sh: line 31: 96794 Segmentation fault: 11  /Users/joshuawu/VeneerLoungeApp/venv/bin/python main.py --ALL --cfg config/kaggle_batch1.yaml
+=== Moving processed images ===
+Completed: 00426.jpg
+Completed: 00427.jpg
+Completed: 00428.jpg
+Completed: 00429.jpg
+Completed: 00430.jpg
+Completed: 00431.jpg
+Completed: 00432.jpg
+Completed: 00433.jpg
+Completed: 00434.jpg
+Completed: 00435.jpg
+=== Batch complete. Remaining:       10 ===
+
+=== Moving next batch of 10 images to active ===
+Queued: 00436.jpg
+Queued: 00437.jpg
+Queued: 00438.jpg
+Queued: 00439.jpg
+Queued: 00440.jpg
+Queued: 00441.jpg
+Queued: 00442.jpg
+Queued: 00443.jpg
+Queued: 00444.jpg
+Queued: 00445.jpg
+=== Processing batch... ===
+Created a directory ./outputs/kaggle_batch1/25-11-16/00442/
+[251116-19:34:49] Image 442, initiating...
+[251116-19:34:49] Step1: Obtaining pseudo edge-region...
+[251116-19:34:50] + Using main device <cpu>
+[251116-19:34:52] + Model is loaded from ./checkpoints/CP_teeth_seg.pth
+[251116-19:35:07] Step2: Refining pre-edge region...
+[251116-19:35:11] + Expanding contours to boundary of the pseudo edge-region............................................................../tmp/batch_loop_fixed.sh: line 31: 97360 Killed: 9               /Users/joshuawu/VeneerLoungeApp/venv/bin/python main.py --ALL --cfg config/kaggle_batch1.yaml
+=== Moving processed images ===
+Completed: 00436.jpg
+Completed: 00437.jpg
+Completed: 00438.jpg
+Completed: 00439.jpg
+Completed: 00440.jpg
+Completed: 00441.jpg
+Completed: 00442.jpg
+Completed: 00443.jpg
+Completed: 00444.jpg
+Completed: 00445.jpg
+=== Batch complete. Remaining:        0 ===
+
+All images processed!
