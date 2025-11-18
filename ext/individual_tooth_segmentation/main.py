@@ -56,15 +56,24 @@ if __name__ == '__main__':
 
     imgs = [int(splitext(file)[0]) for file in os.listdir(dir_image) if splitext(file)[-1][1:] in config['DATA']['EXT']]
 
+    failed_images = []
     for ni in imgs:
-        dir_img = join(dir_output, f'{ni:05d}/')
-        mts.makeDir(dir_img)
-        sts = mts.SaveTools(dir_img)
-        
-        # Inference pseudo edge-regions with a deep neural network
-        ts = TeethSeg(dir_img, ni, sts, config)
-        if args.pseudo_er: ts.pseudoER()
-        if args.inits: ts.initContour()
-        if args.snake: ts.snake()
-        if args.id_region: ts.tem()
+        try:
+            dir_img = join(dir_output, f'{ni:05d}/')
+            mts.makeDir(dir_img)
+            sts = mts.SaveTools(dir_img)
+            
+            # Inference pseudo edge-regions with a deep neural network
+            ts = TeethSeg(dir_img, ni, sts, config)
+            if args.pseudo_er: ts.pseudoER()
+            if args.inits: ts.initContour()
+            if args.snake: ts.snake()
+            if args.id_region: ts.tem()
+        except Exception as e:
+            print(f'[{time.strftime("%y%m%d-%H:%M:%S", time.localtime(time.time()))}] Error processing image {ni}: {e}')
+            failed_images.append(ni)
+            continue
+    
+    if failed_images:
+        print(f'\n[{time.strftime("%y%m%d-%H:%M:%S", time.localtime(time.time()))}] Failed to process {len(failed_images)} images: {failed_images[:10]}{"..." if len(failed_images) > 10 else ""}')
     
