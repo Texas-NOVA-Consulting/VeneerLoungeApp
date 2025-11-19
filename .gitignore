@@ -1,8 +1,0 @@
-ext/individual_tooth_segmentation/outputs/
-ext/individual_tooth_segmentation/dataset/
-ext/individual_tooth_segmentation/checkpoints/*.pth
-
-venv/
-env/
-ENV/
-.venv/

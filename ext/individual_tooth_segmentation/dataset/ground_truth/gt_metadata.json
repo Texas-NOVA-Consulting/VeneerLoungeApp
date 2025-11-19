@@ -1,0 +1,674 @@
+{
+  "created": "2025-11-18T11:08:35.489826",
+  "total_predictions": 101,
+  "approved": [
+    {
+      "image_id": "000004",
+      "image_path": "dataset/kaggle_batch1_processed/00004.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000004.png",
+      "review_path": "dataset/ground_truth/review_images/000004_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-10/00004/000004.pth"
+    },
+    {
+      "image_id": "000008",
+      "image_path": "dataset/kaggle_batch1_processed/00008.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000008.png",
+      "review_path": "dataset/ground_truth/review_images/000008_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-10/00008/000008.pth"
+    },
+    {
+      "image_id": "000010",
+      "image_path": "dataset/kaggle_batch1_processed/00010.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000010.png",
+      "review_path": "dataset/ground_truth/review_images/000010_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-10/00010/000010.pth"
+    },
+    {
+      "image_id": "000018",
+      "image_path": "dataset/kaggle_batch1_processed/00018.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000018.png",
+      "review_path": "dataset/ground_truth/review_images/000018_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00018/000018.pth"
+    },
+    {
+      "image_id": "000019",
+      "image_path": "dataset/kaggle_batch1_processed/00019.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000019.png",
+      "review_path": "dataset/ground_truth/review_images/000019_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-10/00019/000019.pth"
+    },
+    {
+      "image_id": "000024",
+      "image_path": "dataset/kaggle_batch1_processed/00024.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000024.png",
+      "review_path": "dataset/ground_truth/review_images/000024_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00024/000024.pth"
+    },
+    {
+      "image_id": "000025",
+      "image_path": "dataset/kaggle_batch1_processed/00025.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000025.png",
+      "review_path": "dataset/ground_truth/review_images/000025_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-10/00025/000025.pth"
+    },
+    {
+      "image_id": "000031",
+      "image_path": "dataset/kaggle_batch1_processed/00031.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000031.png",
+      "review_path": "dataset/ground_truth/review_images/000031_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-10/00031/000031.pth"
+    },
+    {
+      "image_id": "000037",
+      "image_path": "dataset/kaggle_batch1_processed/00037.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000037.png",
+      "review_path": "dataset/ground_truth/review_images/000037_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00037/000037.pth"
+    },
+    {
+      "image_id": "000040",
+      "image_path": "dataset/kaggle_batch1_processed/00040.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000040.png",
+      "review_path": "dataset/ground_truth/review_images/000040_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-10/00040/000040.pth"
+    },
+    {
+      "image_id": "000041",
+      "image_path": "dataset/kaggle_batch1_processed/00041.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000041.png",
+      "review_path": "dataset/ground_truth/review_images/000041_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00041/000041.pth"
+    },
+    {
+      "image_id": "000042",
+      "image_path": "dataset/kaggle_batch1_processed/00042.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000042.png",
+      "review_path": "dataset/ground_truth/review_images/000042_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00042/000042.pth"
+    },
+    {
+      "image_id": "000043",
+      "image_path": "dataset/kaggle_batch1_processed/00043.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000043.png",
+      "review_path": "dataset/ground_truth/review_images/000043_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00043/000043.pth"
+    },
+    {
+      "image_id": "000044",
+      "image_path": "dataset/kaggle_batch1_processed/00044.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000044.png",
+      "review_path": "dataset/ground_truth/review_images/000044_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00044/000044.pth"
+    },
+    {
+      "image_id": "000045",
+      "image_path": "dataset/kaggle_batch1_processed/00045.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000045.png",
+      "review_path": "dataset/ground_truth/review_images/000045_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00045/000045.pth"
+    },
+    {
+      "image_id": "000046",
+      "image_path": "dataset/kaggle_batch1_processed/00046.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000046.png",
+      "review_path": "dataset/ground_truth/review_images/000046_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-10/00046/000046.pth"
+    },
+    {
+      "image_id": "000047",
+      "image_path": "dataset/kaggle_batch1_processed/00047.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000047.png",
+      "review_path": "dataset/ground_truth/review_images/000047_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-18/00047/000047.pth"
+    },
+    {
+      "image_id": "000052",
+      "image_path": "dataset/kaggle_batch1_processed/00052.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000052.png",
+      "review_path": "dataset/ground_truth/review_images/000052_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00052/000052.pth"
+    },
+    {
+      "image_id": "000053",
+      "image_path": "dataset/kaggle_batch1_processed/00053.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000053.png",
+      "review_path": "dataset/ground_truth/review_images/000053_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-18/00053/000053.pth"
+    },
+    {
+      "image_id": "000057",
+      "image_path": "dataset/kaggle_batch1_processed/00057.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000057.png",
+      "review_path": "dataset/ground_truth/review_images/000057_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00057/000057.pth"
+    },
+    {
+      "image_id": "000064",
+      "image_path": "dataset/kaggle_batch1_processed/00064.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000064.png",
+      "review_path": "dataset/ground_truth/review_images/000064_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00064/000064.pth"
+    },
+    {
+      "image_id": "000068",
+      "image_path": "dataset/kaggle_batch1_processed/00068.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000068.png",
+      "review_path": "dataset/ground_truth/review_images/000068_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00068/000068.pth"
+    },
+    {
+      "image_id": "000073",
+      "image_path": "dataset/kaggle_batch1_processed/00073.jpeg",
+      "gt_path": "dataset/ground_truth/auto_generated/000073.png",
+      "review_path": "dataset/ground_truth/review_images/000073_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00073/000073.pth"
+    },
+    {
+      "image_id": "000078",
+      "image_path": "dataset/kaggle_batch1_processed/00078.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000078.png",
+      "review_path": "dataset/ground_truth/review_images/000078_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00078/000078.pth"
+    },
+    {
+      "image_id": "000079",
+      "image_path": "dataset/kaggle_batch1_processed/00079.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000079.png",
+      "review_path": "dataset/ground_truth/review_images/000079_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-10/00079/000079.pth"
+    },
+    {
+      "image_id": "000084",
+      "image_path": "dataset/kaggle_batch1_processed/00084.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000084.png",
+      "review_path": "dataset/ground_truth/review_images/000084_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00084/000084.pth"
+    },
+    {
+      "image_id": "000087",
+      "image_path": "dataset/kaggle_batch1_processed/00087.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000087.png",
+      "review_path": "dataset/ground_truth/review_images/000087_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00087/000087.pth"
+    },
+    {
+      "image_id": "000090",
+      "image_path": "dataset/kaggle_batch1_processed/00090.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000090.png",
+      "review_path": "dataset/ground_truth/review_images/000090_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00090/000090.pth"
+    },
+    {
+      "image_id": "000091",
+      "image_path": "dataset/kaggle_batch1_processed/00091.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000091.png",
+      "review_path": "dataset/ground_truth/review_images/000091_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00091/000091.pth"
+    },
+    {
+      "image_id": "000097",
+      "image_path": "dataset/kaggle_batch1_processed/00097.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000097.png",
+      "review_path": "dataset/ground_truth/review_images/000097_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00097/000097.pth"
+    },
+    {
+      "image_id": "000104",
+      "image_path": "dataset/kaggle_batch1_processed/00104.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000104.png",
+      "review_path": "dataset/ground_truth/review_images/000104_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00104/000104.pth"
+    },
+    {
+      "image_id": "000108",
+      "image_path": "dataset/kaggle_batch1_processed/00108.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000108.png",
+      "review_path": "dataset/ground_truth/review_images/000108_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00108/000108.pth"
+    },
+    {
+      "image_id": "000113",
+      "image_path": "dataset/kaggle_batch1_processed/00113.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000113.png",
+      "review_path": "dataset/ground_truth/review_images/000113_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00113/000113.pth"
+    },
+    {
+      "image_id": "000118",
+      "image_path": "dataset/kaggle_batch1_processed/00118.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000118.png",
+      "review_path": "dataset/ground_truth/review_images/000118_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00118/000118.pth"
+    },
+    {
+      "image_id": "000119",
+      "image_path": "dataset/kaggle_batch1_processed/00119.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000119.png",
+      "review_path": "dataset/ground_truth/review_images/000119_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00119/000119.pth"
+    },
+    {
+      "image_id": "000125",
+      "image_path": "dataset/kaggle_batch1_processed/00125.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000125.png",
+      "review_path": "dataset/ground_truth/review_images/000125_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00125/000125.pth"
+    },
+    {
+      "image_id": "000126",
+      "image_path": "dataset/kaggle_batch1_processed/00126.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000126.png",
+      "review_path": "dataset/ground_truth/review_images/000126_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00126/000126.pth"
+    },
+    {
+      "image_id": "000130",
+      "image_path": "dataset/kaggle_batch1_processed/00130.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000130.png",
+      "review_path": "dataset/ground_truth/review_images/000130_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00130/000130.pth"
+    },
+    {
+      "image_id": "000133",
+      "image_path": "dataset/kaggle_batch1_processed/00133.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000133.png",
+      "review_path": "dataset/ground_truth/review_images/000133_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00133/000133.pth"
+    },
+    {
+      "image_id": "000134",
+      "image_path": "dataset/kaggle_batch1_processed/00134.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000134.png",
+      "review_path": "dataset/ground_truth/review_images/000134_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00134/000134.pth"
+    },
+    {
+      "image_id": "000151",
+      "image_path": "dataset/kaggle_batch1_processed/00151.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000151.png",
+      "review_path": "dataset/ground_truth/review_images/000151_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00151/000151.pth"
+    },
+    {
+      "image_id": "000152",
+      "image_path": "dataset/kaggle_batch1_processed/00152.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000152.png",
+      "review_path": "dataset/ground_truth/review_images/000152_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00152/000152.pth"
+    },
+    {
+      "image_id": "000168",
+      "image_path": "dataset/kaggle_batch1_processed/00168.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000168.png",
+      "review_path": "dataset/ground_truth/review_images/000168_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00168/000168.pth"
+    },
+    {
+      "image_id": "000179",
+      "image_path": "dataset/kaggle_batch1_processed/00179.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000179.png",
+      "review_path": "dataset/ground_truth/review_images/000179_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00179/000179.pth"
+    },
+    {
+      "image_id": "000185",
+      "image_path": "dataset/kaggle_batch1_processed/00185.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000185.png",
+      "review_path": "dataset/ground_truth/review_images/000185_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00185/000185.pth"
+    },
+    {
+      "image_id": "000186",
+      "image_path": "dataset/kaggle_batch1_processed/00186.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000186.png",
+      "review_path": "dataset/ground_truth/review_images/000186_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00186/000186.pth"
+    },
+    {
+      "image_id": "000192",
+      "image_path": "dataset/kaggle_batch1_processed/00192.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000192.png",
+      "review_path": "dataset/ground_truth/review_images/000192_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00192/000192.pth"
+    },
+    {
+      "image_id": "000197",
+      "image_path": "dataset/kaggle_batch1_processed/00197.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000197.png",
+      "review_path": "dataset/ground_truth/review_images/000197_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00197/000197.pth"
+    },
+    {
+      "image_id": "000205",
+      "image_path": "dataset/kaggle_batch1_processed/00205.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000205.png",
+      "review_path": "dataset/ground_truth/review_images/000205_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00205/000205.pth"
+    },
+    {
+      "image_id": "000209",
+      "image_path": "dataset/kaggle_batch1_processed/00209.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000209.png",
+      "review_path": "dataset/ground_truth/review_images/000209_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00209/000209.pth"
+    },
+    {
+      "image_id": "000212",
+      "image_path": "dataset/kaggle_batch1_processed/00212.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000212.png",
+      "review_path": "dataset/ground_truth/review_images/000212_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00212/000212.pth"
+    },
+    {
+      "image_id": "000219",
+      "image_path": "dataset/kaggle_batch1_processed/00219.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000219.png",
+      "review_path": "dataset/ground_truth/review_images/000219_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00219/000219.pth"
+    },
+    {
+      "image_id": "000227",
+      "image_path": "dataset/kaggle_batch1_processed/00227.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000227.png",
+      "review_path": "dataset/ground_truth/review_images/000227_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00227/000227.pth"
+    },
+    {
+      "image_id": "000233",
+      "image_path": "dataset/kaggle_batch1_processed/00233.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000233.png",
+      "review_path": "dataset/ground_truth/review_images/000233_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00233/000233.pth"
+    },
+    {
+      "image_id": "000236",
+      "image_path": "dataset/kaggle_batch1_processed/00236.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000236.png",
+      "review_path": "dataset/ground_truth/review_images/000236_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00236/000236.pth"
+    },
+    {
+      "image_id": "000240",
+      "image_path": "dataset/kaggle_batch1_processed/00240.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000240.png",
+      "review_path": "dataset/ground_truth/review_images/000240_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00240/000240.pth"
+    },
+    {
+      "image_id": "000242",
+      "image_path": "dataset/kaggle_batch1_processed/00242.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000242.png",
+      "review_path": "dataset/ground_truth/review_images/000242_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00242/000242.pth"
+    },
+    {
+      "image_id": "000244",
+      "image_path": "dataset/kaggle_batch1_processed/00244.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000244.png",
+      "review_path": "dataset/ground_truth/review_images/000244_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00244/000244.pth"
+    },
+    {
+      "image_id": "000250",
+      "image_path": "dataset/kaggle_batch1_processed/00250.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000250.png",
+      "review_path": "dataset/ground_truth/review_images/000250_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00250/000250.pth"
+    },
+    {
+      "image_id": "000251",
+      "image_path": "dataset/kaggle_batch1_processed/00251.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000251.png",
+      "review_path": "dataset/ground_truth/review_images/000251_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00251/000251.pth"
+    },
+    {
+      "image_id": "000253",
+      "image_path": "dataset/kaggle_batch1_processed/00253.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000253.png",
+      "review_path": "dataset/ground_truth/review_images/000253_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00253/000253.pth"
+    },
+    {
+      "image_id": "000256",
+      "image_path": "dataset/kaggle_batch1_processed/00256.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000256.png",
+      "review_path": "dataset/ground_truth/review_images/000256_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00256/000256.pth"
+    },
+    {
+      "image_id": "000265",
+      "image_path": "dataset/kaggle_batch1_processed/00265.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000265.png",
+      "review_path": "dataset/ground_truth/review_images/000265_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00265/000265.pth"
+    },
+    {
+      "image_id": "000269",
+      "image_path": "dataset/kaggle_batch1_processed/00269.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000269.png",
+      "review_path": "dataset/ground_truth/review_images/000269_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00269/000269.pth"
+    },
+    {
+      "image_id": "000271",
+      "image_path": "dataset/kaggle_batch1_processed/00271.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000271.png",
+      "review_path": "dataset/ground_truth/review_images/000271_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00271/000271.pth"
+    },
+    {
+      "image_id": "000278",
+      "image_path": "dataset/kaggle_batch1_processed/00278.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000278.png",
+      "review_path": "dataset/ground_truth/review_images/000278_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00278/000278.pth"
+    },
+    {
+      "image_id": "000284",
+      "image_path": "dataset/kaggle_batch1_processed/00284.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000284.png",
+      "review_path": "dataset/ground_truth/review_images/000284_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00284/000284.pth"
+    },
+    {
+      "image_id": "000287",
+      "image_path": "dataset/kaggle_batch1_processed/00287.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000287.png",
+      "review_path": "dataset/ground_truth/review_images/000287_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00287/000287.pth"
+    },
+    {
+      "image_id": "000293",
+      "image_path": "dataset/kaggle_batch1_processed/00293.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000293.png",
+      "review_path": "dataset/ground_truth/review_images/000293_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00293/000293.pth"
+    },
+    {
+      "image_id": "000296",
+      "image_path": "dataset/kaggle_batch1_processed/00296.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000296.png",
+      "review_path": "dataset/ground_truth/review_images/000296_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00296/000296.pth"
+    },
+    {
+      "image_id": "000305",
+      "image_path": "dataset/kaggle_batch1_processed/00305.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000305.png",
+      "review_path": "dataset/ground_truth/review_images/000305_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00305/000305.pth"
+    },
+    {
+      "image_id": "000309",
+      "image_path": "dataset/kaggle_batch1_processed/00309.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000309.png",
+      "review_path": "dataset/ground_truth/review_images/000309_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00309/000309.pth"
+    },
+    {
+      "image_id": "000311",
+      "image_path": "dataset/kaggle_batch1_processed/00311.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000311.png",
+      "review_path": "dataset/ground_truth/review_images/000311_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00311/000311.pth"
+    },
+    {
+      "image_id": "000318",
+      "image_path": "dataset/kaggle_batch1_processed/00318.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000318.png",
+      "review_path": "dataset/ground_truth/review_images/000318_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00318/000318.pth"
+    },
+    {
+      "image_id": "000324",
+      "image_path": "dataset/kaggle_batch1_processed/00324.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000324.png",
+      "review_path": "dataset/ground_truth/review_images/000324_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00324/000324.pth"
+    },
+    {
+      "image_id": "000330",
+      "image_path": "dataset/kaggle_batch1_processed/00330.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000330.png",
+      "review_path": "dataset/ground_truth/review_images/000330_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00330/000330.pth"
+    },
+    {
+      "image_id": "000331",
+      "image_path": "dataset/kaggle_batch1_processed/00331.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000331.png",
+      "review_path": "dataset/ground_truth/review_images/000331_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00331/000331.pth"
+    },
+    {
+      "image_id": "000333",
+      "image_path": "dataset/kaggle_batch1_processed/00333.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000333.png",
+      "review_path": "dataset/ground_truth/review_images/000333_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00333/000333.pth"
+    },
+    {
+      "image_id": "000336",
+      "image_path": "dataset/kaggle_batch1_processed/00336.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000336.png",
+      "review_path": "dataset/ground_truth/review_images/000336_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00336/000336.pth"
+    },
+    {
+      "image_id": "000344",
+      "image_path": "dataset/kaggle_batch1_processed/00344.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000344.png",
+      "review_path": "dataset/ground_truth/review_images/000344_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00344/000344.pth"
+    },
+    {
+      "image_id": "000347",
+      "image_path": "dataset/kaggle_batch1_processed/00347.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000347.png",
+      "review_path": "dataset/ground_truth/review_images/000347_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00347/000347.pth"
+    },
+    {
+      "image_id": "000353",
+      "image_path": "dataset/kaggle_batch1_processed/00353.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000353.png",
+      "review_path": "dataset/ground_truth/review_images/000353_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00353/000353.pth"
+    },
+    {
+      "image_id": "000356",
+      "image_path": "dataset/kaggle_batch1_processed/00356.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000356.png",
+      "review_path": "dataset/ground_truth/review_images/000356_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00356/000356.pth"
+    },
+    {
+      "image_id": "000365",
+      "image_path": "dataset/kaggle_batch1_processed/00365.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000365.png",
+      "review_path": "dataset/ground_truth/review_images/000365_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00365/000365.pth"
+    },
+    {
+      "image_id": "000369",
+      "image_path": "dataset/kaggle_batch1_processed/00369.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000369.png",
+      "review_path": "dataset/ground_truth/review_images/000369_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00369/000369.pth"
+    },
+    {
+      "image_id": "000372",
+      "image_path": "dataset/kaggle_batch1_processed/00372.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000372.png",
+      "review_path": "dataset/ground_truth/review_images/000372_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00372/000372.pth"
+    },
+    {
+      "image_id": "000378",
+      "image_path": "dataset/kaggle_batch1_processed/00378.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000378.png",
+      "review_path": "dataset/ground_truth/review_images/000378_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00378/000378.pth"
+    },
+    {
+      "image_id": "000384",
+      "image_path": "dataset/kaggle_batch1_processed/00384.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000384.png",
+      "review_path": "dataset/ground_truth/review_images/000384_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00384/000384.pth"
+    },
+    {
+      "image_id": "000390",
+      "image_path": "dataset/kaggle_batch1_processed/00390.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000390.png",
+      "review_path": "dataset/ground_truth/review_images/000390_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00390/000390.pth"
+    },
+    {
+      "image_id": "000391",
+      "image_path": "dataset/kaggle_batch1_processed/00391.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000391.png",
+      "review_path": "dataset/ground_truth/review_images/000391_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00391/000391.pth"
+    },
+    {
+      "image_id": "000414",
+      "image_path": "dataset/kaggle_batch1_processed/00414.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000414.png",
+      "review_path": "dataset/ground_truth/review_images/000414_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-09/00414/000414.pth"
+    },
+    {
+      "image_id": "000422",
+      "image_path": "dataset/kaggle_batch1_processed/00422.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000422.png",
+      "review_path": "dataset/ground_truth/review_images/000422_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00422/000422.pth"
+    },
+    {
+      "image_id": "000435",
+      "image_path": "dataset/kaggle_batch1_processed/00435.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000435.png",
+      "review_path": "dataset/ground_truth/review_images/000435_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00435/000435.pth"
+    },
+    {
+      "image_id": "000440",
+      "image_path": "dataset/kaggle_batch1_processed/00440.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000440.png",
+      "review_path": "dataset/ground_truth/review_images/000440_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-10/00440/000440.pth"
+    },
+    {
+      "image_id": "000442",
+      "image_path": "dataset/kaggle_batch1_processed/00442.jpg",
+      "gt_path": "dataset/ground_truth/auto_generated/000442.png",
+      "review_path": "dataset/ground_truth/review_images/000442_review.png",
+      "prediction_path": "outputs/kaggle_batch1/25-11-16/00442/000442.pth"
+    }
+  ],
+  "rejected": [],
+  "pending": [],
+  "last_review": "2025-11-18T11:15:43.876898"
+}
