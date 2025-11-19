@@ -33,7 +33,19 @@ def extract_mask(payload: dict) -> Optional[np.ndarray]:
         phi = np.asarray(payload["phi_res"])
         if phi.size == 0:
             return None
-        mask = (phi <= 0).astype(np.uint8)
+        mask = (phi <= 0).astype(np.uint8) * 255
+        return mask
+
+    # Fallback to per (refined edge region)
+    if "per" in payload:
+        per = np.asarray(payload["per"])
+        mask = (per > 0.5).astype(np.uint8) * 255
+        return mask
+
+    # Fallback to per0 (pseudo edge region)
+    if "per0" in payload:
+        per0 = np.asarray(payload["per0"])
+        mask = (per0 > 0.5).astype(np.uint8) * 255
         return mask
 
     return None
@@ -42,7 +54,8 @@ def extract_mask(payload: dict) -> Optional[np.ndarray]:
 def export_masks(outputs_dir: Path, dest_dir: Path, overwrite: bool = False) -> None:
     dest_dir.mkdir(parents=True, exist_ok=True)
 
-    pth_files = sorted(outputs_dir.glob("*/??????.pth"))
+    # Search recursively for .pth files
+    pth_files = sorted(outputs_dir.rglob("*.pth"))
     if not pth_files:
         print(f"No prediction files found under {outputs_dir}")
         return
