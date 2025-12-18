@@ -21,7 +21,7 @@ from diffusers import ControlNetModel, StableDiffusionControlNetPipeline, UniPCM
 
 # Add tooth segmentation model path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / 'individual_tooth_segmentation'))
-from src.network.model import TeethSegmentationNet
+from src.network.model import ResNeSt50_TC as TeethSegmentationNet
 
 
 class VeneerControlNetGenerator:
@@ -81,12 +81,23 @@ class VeneerControlNetGenerator:
         self.seg_model = None
         if segmentation_checkpoint:
             print(f"Loading segmentation model from {segmentation_checkpoint}...")
-            self.seg_model = TeethSegmentationNet()
+            # ResNeSt50_TC expects in_ch=3 (RGB), out_ch=1 (binary mask)
+            self.seg_model = TeethSegmentationNet(in_ch=3, out_ch=1)
             checkpoint = torch.load(segmentation_checkpoint, map_location=self.device)
+
+            # Extract state dict from checkpoint
             if 'model_state_dict' in checkpoint:
-                self.seg_model.load_state_dict(checkpoint['model_state_dict'])
+                state_dict = checkpoint['model_state_dict']
+            elif 'net_state_dict' in checkpoint:
+                state_dict = checkpoint['net_state_dict']
             else:
-                self.seg_model.load_state_dict(checkpoint)
+                state_dict = checkpoint
+
+            # Remove 'module.' prefix if present (from DataParallel training)
+            if any(k.startswith('module.') for k in state_dict.keys()):
+                state_dict = {k.replace('module.', ''): v for k, v in state_dict.items()}
+
+            self.seg_model.load_state_dict(state_dict)
             self.seg_model.to(self.device)
             self.seg_model.eval()
 

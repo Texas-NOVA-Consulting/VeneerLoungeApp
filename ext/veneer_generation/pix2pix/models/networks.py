@@ -241,7 +241,6 @@ def define_generator(input_nc=3, output_nc=3, ngf=64, init_type='normal', device
 def define_discriminator(input_nc=6, ndf=64, init_type='normal', device='cuda'):
     """
     Create and initialize discriminator.
-
     Args:
         input_nc: Number of input channels (typically 6 = 3 + 3)
         ndf: Number of discriminator filters
