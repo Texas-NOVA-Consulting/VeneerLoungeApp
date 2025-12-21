@@ -14,9 +14,17 @@ import io
 from pathlib import Path
 from PIL import Image
 import traceback
+import logging
 
 sys.path.insert(0, str(Path(__file__).parent))
 from veneer_service import get_veneer_service
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 CORS(app)
@@ -34,13 +42,22 @@ def get_service():
         if model_type == 'controlnet':
             controlnet_path = os.environ.get(
                 'CONTROLNET_PATH',
-                'lllyasviel/control_v11p_sd15_seg' 
+                'lllyasviel/control_v11p_sd15_seg'
             )
+            seg_checkpoint_path = Path(__file__).parent.parent.parent / \
+                                'ext/individual_tooth_segmentation/checkpoints/CP_teeth_seg.pth'
+
             config = {
                 'controlnet_path': controlnet_path,
-                'segmentation_checkpoint': str(Path(__file__).parent.parent.parent /
-                                               'ext/individual_tooth_segmentation/checkpoints/CP_teeth_seg.pth')
             }
+            if seg_checkpoint_path.exists():
+                config['segmentation_checkpoint'] = str(seg_checkpoint_path)
+                print(f"Using tooth segmentation checkpoint: {seg_checkpoint_path}")
+            else:
+                print("Warning: Tooth segmentation checkpoint not found. Using fallback method.")
+                print(f"Expected at: {seg_checkpoint_path}")
+                # ControlNet will use fallback color-based segmentation
+                config['segmentation_checkpoint'] = None
         else:
             config = {
                 'checkpoint_path': str(Path(__file__).parent.parent.parent /
@@ -78,7 +95,6 @@ def health_check():
 def generate_preview():
     """
     Generate veneer preview from base64 encoded image.
-
     Request body:
         {
             "image": "data:image/jpeg;base64,...",
@@ -94,27 +110,40 @@ def generate_preview():
         }
     """
     try:
-        # Parse request
+        logger.info("=== Starting veneer preview generation ===")
         data = request.json
+
         if not data or 'image' not in data:
+            logger.error("Missing 'image' field in request")
             return jsonify({
                 'error': 'Missing required field: image',
                 'success': False
             }), 400
 
+        logger.info("Step 1: Request received, parsing parameters")
         image_base64 = data['image']
+        if image_base64.startswith("data:"):
+            image_base64 = image_base64.split(",", 1)[1]
+
         intensity = data.get('intensity', 0.8)
         preserve_geometry = data.get('preserve_geometry', False)
         custom_prompt = data.get('custom_prompt', None)
 
+        logger.info(f"Parameters: intensity={intensity}, preserve_geometry={preserve_geometry}")
+        logger.info(f"Image data length: {len(image_base64) if image_base64 else 0}")
+
         if not 0 <= intensity <= 1:
+            logger.error(f"Invalid intensity value: {intensity}")
             return jsonify({
                 'error': 'Intensity must be between 0 and 1',
                 'success': False
             }), 400
 
+        logger.info("Step 2: Getting service instance")
         service = get_service()
+        logger.info(f"Service loaded: {service.model_type} on {service.device}")
 
+        logger.info("Step 3: Calling generate_from_base64")
         # Generate preview
         preview_base64 = service.generate_from_base64(
             base64_image=image_base64,
@@ -122,19 +151,24 @@ def generate_preview():
             preserve_geometry=preserve_geometry,
             custom_prompt=custom_prompt
         )
-
+        logger.info("Step 4: Generation complete, returning result")
         return jsonify({
             'output': [preview_base64],
             'success': True
         })
 
     except Exception as e:
-        print(f"Error generating preview: {e}")
-        traceback.print_exc()
+        logger.error("="*60)
+        logger.error(f"ERROR generating preview: {e}")
+        logger.error("="*60)
+        logger.error("Full traceback:")
+        logger.error(traceback.format_exc())  # This logs to logger instead of print
         return jsonify({
             'error': str(e),
+            'traceback': traceback.format_exc() if app.debug else None,  # Only in debug mode
             'success': False
         }), 500
+
 
 
 @app.route('/api/veneer-preview/file', methods=['POST'])
@@ -311,6 +345,14 @@ if __name__ == '__main__':
     # Set model type
     import os
     os.environ['VENEER_MODEL_TYPE'] = args.model
+
+    # Configure Flask logging
+    if args.debug:
+        logging.getLogger('werkzeug').setLevel(logging.DEBUG)
+        app.logger.setLevel(logging.DEBUG)
+    else:
+        logging.getLogger('werkzeug').setLevel(logging.INFO)
+        app.logger.setLevel(logging.INFO)
 
     print("=" * 60)
     print("Veneer Preview API Server")

@@ -11,6 +11,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Image is required" }, { status: 400 })
     }
 
+    const controller = new AbortController()
+    setTimeout(() => controller.abort(), 180000)
     const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
 
     const response = await fetch(`${backendUrl}/api/veneer-preview`, {
@@ -20,11 +22,12 @@ export async function POST(request: NextRequest) {
         image: image,
         intensity: 0.8,
         preserve_geometry: true,
-      })
+      }),
+      signal: controller.signal
     });
 
     const data = await response.json();
-
+    console.log(data);
     if (!response.ok) {
       throw new Error(data.error || "Backend Veneer Generation failed");
 
@@ -35,4 +38,12 @@ export async function POST(request: NextRequest) {
     const errorMessage = error instanceof Error ? error.message : "Failed to generate simulation"
     return NextResponse.json({ error: errorMessage }, { status: 500 })
   }
+}
+
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "10mb",
+    },
+  },
 }

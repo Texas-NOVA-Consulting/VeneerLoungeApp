@@ -42,6 +42,7 @@ export default function SimulationPage() {
     }
     setIsGenerating(true)
     try {
+      console.log("reached checkpoint1");
       const response = await fetch("/api/simulate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -53,6 +54,7 @@ export default function SimulationPage() {
       })
 
       const data = await response.json()
+      console.log(data);
 
       if (!response.ok) {
         throw new Error(data.error || "Simulation failed")

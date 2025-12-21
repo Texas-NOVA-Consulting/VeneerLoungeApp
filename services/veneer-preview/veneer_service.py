@@ -12,7 +12,6 @@ The service handles:
 4. Result post-processing
 5. Base64 encoding for API responses
 """
-
 import base64
 import io
 import sys
@@ -20,8 +19,8 @@ from pathlib import Path
 from PIL import Image
 import torch
 import numpy as np
+import logging
 
-# Add paths
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / 'ext' / 'veneer_generation'))
 
 
@@ -31,7 +30,7 @@ class VeneerPreviewService:
     Supports multiple model backends with a consistent interface.
     """
 
-    def __init__(self, model_type='controlnet', **model_config):
+    def __init__(self, model_type='pix2pix', **model_config):
         """
         Initialize the veneer preview service.
 
@@ -75,15 +74,14 @@ class VeneerPreviewService:
         """Initialize ControlNet generator."""
         from controlnet.inference_controlnet import VeneerControlNetGenerator
 
-        required_keys = ['controlnet_path', 'segmentation_checkpoint']
-        for key in required_keys:
-            if key not in config:
-                raise ValueError(f"Missing required config key for ControlNet: {key}")
+        # Only controlnet_path is required, segmentation is optional
+        if 'controlnet_path' not in config:
+            raise ValueError(f"Missing required config key for ControlNet: controlnet_path")
 
         self.generator = VeneerControlNetGenerator(
             controlnet_path=config['controlnet_path'],
             base_model_path=config.get('base_model_path', 'runwayml/stable-diffusion-v1-5'),
-            segmentation_checkpoint=config['segmentation_checkpoint'],
+            segmentation_checkpoint=config.get('segmentation_checkpoint', None),
             device=str(self.device)
         )
 
@@ -144,29 +142,38 @@ class VeneerPreviewService:
         custom_prompt,
         **kwargs
     ):
+        # Lower guidance to reduce hallucinations and distortion
         if preserve_geometry:
-            controlnet_scale = 1.5
-            guidance_scale = 6.0
+            controlnet_scale = 1.2
+            guidance_scale = 5.0  # Lowered from 7.5
         else:
-            controlnet_scale = 1.0
-            guidance_scale = 7.5
+            controlnet_scale = 0.9
+            guidance_scale = 5.5  # Lowered from 8.0
 
+        # Use conservative clinical prompts unless custom provided
         if custom_prompt is None:
             if preserve_geometry:
-                prompt = f"professional dental veneers, white teeth, beautiful smile, natural looking, high quality, photorealistic"
+                # Focus on minimal changes, preserve tooth position
+                prompt = "natural dental veneers applied only to existing tooth enamel, realistic tooth anatomy, maintain tooth position, natural enamel texture, photorealistic dentistry"
             else:
-                prompt = f"professional dental veneers, perfectly aligned white teeth, beautiful smile, high quality, photorealistic"
-
+                # Allow some alignment but stay clinical
+                prompt = "natural dental veneers applied only to existing tooth enamel, realistic tooth anatomy, proper dental occlusion, natural enamel texture, photorealistic dentistry"
         else:
             prompt = custom_prompt
+
+        # Enable debug directory
+        import os
+        debug_dir = Path(__file__).parent.parent.parent / 'debug_outputs'
+        os.makedirs(debug_dir, exist_ok=True)
 
         result = self.generator.generate_veneer_preview(
             image=image,
             prompt=prompt,
-            num_inference_steps=kwargs.get('steps', 20),
+            num_inference_steps=kwargs.get('steps', 30),
             guidance_scale=guidance_scale,
             controlnet_conditioning_scale=controlnet_scale,
-            seed=kwargs.get('seed', None)
+            seed=kwargs.get('seed', None),
+            debug_dir=str(debug_dir)
         )
 
         return result
@@ -197,9 +204,6 @@ class VeneerPreviewService:
     ):
         """
         Generate veneer preview from base64 encoded image.
-
-        This is the main API endpoint function.
-
         Args:
             base64_image: Base64 encoded image string
             intensity: Transformation intensity (0-1)
@@ -213,20 +217,16 @@ class VeneerPreviewService:
             or PIL Image (if return_format='pil')
         """
         try:
-            # DEBUG: Log what we received
-            print(f"DEBUG: Received base64_image type: {type(base64_image)}")
-            print(f"DEBUG: base64_image length: {len(base64_image) if base64_image else 0}")
-            print(f"DEBUG: First 100 chars: {base64_image[:100] if base64_image else 'None'}")
-            
             if ',' in base64_image:
                 base64_image = base64_image.split(',')[1]
-                print(f"DEBUG: After comma split, length: {len(base64_image)}")
 
             image_data = base64.b64decode(base64_image)
-            print(f"DEBUG: Decoded image_data length: {len(image_data)}")
-            print(f"DEBUG: First 10 bytes: {image_data[:10]}")
-            
             image = Image.open(io.BytesIO(image_data)).convert('RGB')
+
+            import os
+            debug_dir = Path(__file__).parent.parent.parent / 'debug_outputs'
+            os.makedirs(debug_dir, exist_ok=True)
+            image.save(debug_dir / 'input_image.jpg')
             preview = self.generate_from_pil(
                 image=image,
                 intensity=intensity,
@@ -330,10 +330,7 @@ if __name__ == "__main__":
     else:
         config = {}
 
-    # Get service
     service = get_veneer_service(model_type=args.model, **config)
-
-    # Generate preview
     result = service.generate_from_file(
         file_path=args.image,
         output_path=args.output,

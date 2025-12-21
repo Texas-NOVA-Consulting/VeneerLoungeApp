@@ -31,7 +31,13 @@ cleanup() {
 
 trap cleanup SIGINT SIGTERM
 
-# Start Backend
+mkdir -p logs
+echo "Logs will be saved to:"
+echo "  Backend:  logs/backend.log"  
+echo "  Frontend: logs/frontend.log"
+echo ""
+
+
 echo -e "${BLUE}[1/2] Starting Backend API Server...${NC}"
 echo "      Using pretrained ControlNet from Hugging Face"
 echo "      Port: 8000"
@@ -47,7 +53,7 @@ else
 fi
 
 # Start backend in background
-VENEER_MODEL_TYPE=controlnet python api_server.py --model controlnet --port 8000 &
+VENEER_MODEL_TYPE=controlnet python api_server.py --model controlnet --port 8000 > ../../logs/backend.log 2>&1 &
 BACKEND_PID=$!
 
 echo -e "${GREEN}✓ Backend starting (PID: $BACKEND_PID)${NC}"
@@ -93,11 +99,11 @@ fi
 # Install dependencies if needed
 if [ ! -d "node_modules" ]; then
     echo "Installing frontend dependencies (this may take a few minutes)..."
-    pnpm install
+    npm install
 fi
 
 # Start frontend in background
-pnpm dev > /dev/null 2>&1 &
+npm run dev > ../logs/frontend.log 2>&1 &
 FRONTEND_PID=$!
 
 echo -e "${GREEN}✓ Frontend starting (PID: $FRONTEND_PID)${NC}"

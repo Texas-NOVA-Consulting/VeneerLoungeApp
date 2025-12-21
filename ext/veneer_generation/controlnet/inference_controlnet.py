@@ -16,23 +16,13 @@ import torch
 import numpy as np
 from PIL import Image
 import cv2
-from diffusers import ControlNetModel, StableDiffusionControlNetPipeline, UniPCMultistepScheduler
+from diffusers import ControlNetModel, StableDiffusionControlNetInpaintPipeline, UniPCMultistepScheduler
 
-
-# Add tooth segmentation model path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / 'individual_tooth_segmentation'))
 from src.network.model import ResNeSt50_TC as TeethSegmentationNet
 
 
 class VeneerControlNetGenerator:
-    """
-    Complete veneer preview generation pipeline using ControlNet.
-
-    This class:
-    1. Loads trained ControlNet model
-    2. Uses tooth segmentation for conditioning
-    3. Generates photorealistic veneer previews
-    """
 
     def __init__(
         self,
@@ -52,54 +42,52 @@ class VeneerControlNetGenerator:
         """
         self.device = torch.device(device if torch.cuda.is_available() else 'cpu')
         print(f"Using device: {self.device}")
-
-        # Load ControlNet
+        dtype = torch.float16 if self.device.type == 'cuda' else torch.float32
         print(f"Loading ControlNet from {controlnet_path}...")
-        controlnet = ControlNetModel.from_pretrained(controlnet_path, torch_dtype=torch.float16)
+        controlnet = ControlNetModel.from_pretrained(controlnet_path, torch_dtype=dtype)
 
-        # Load pipeline
-        print(f"Loading Stable Diffusion pipeline...")
-        self.pipe = StableDiffusionControlNetPipeline.from_pretrained(
+        print(f"Loading Stable Diffusion Inpainting pipeline...")
+        self.pipe = StableDiffusionControlNetInpaintPipeline.from_pretrained(
             base_model_path,
             controlnet=controlnet,
-            torch_dtype=torch.float16,
+            torch_dtype=dtype,
             safety_checker=None
         )
 
-        # Use fast scheduler
         self.pipe.scheduler = UniPCMultistepScheduler.from_config(self.pipe.scheduler.config)
-
-        # Move to device
         self.pipe = self.pipe.to(self.device)
 
-        # Enable memory optimizations
         if self.device.type == 'cuda':
             self.pipe.enable_model_cpu_offload()
-            # self.pipe.enable_xformers_memory_efficient_attention()  # Uncomment if xformers installed
 
         # Load segmentation model if provided
         self.seg_model = None
-        if segmentation_checkpoint:
-            print(f"Loading segmentation model from {segmentation_checkpoint}...")
-            # ResNeSt50_TC expects in_ch=3 (RGB), out_ch=1 (binary mask)
-            self.seg_model = TeethSegmentationNet(in_ch=3, out_ch=1)
-            checkpoint = torch.load(segmentation_checkpoint, map_location=self.device)
+        if segmentation_checkpoint and segmentation_checkpoint != 'None':
+            try:
+                print(f"Loading segmentation model from {segmentation_checkpoint}...")
+                self.seg_model = TeethSegmentationNet(in_ch=3, out_ch=1)
+                checkpoint = torch.load(segmentation_checkpoint, map_location=self.device)
 
-            # Extract state dict from checkpoint
-            if 'model_state_dict' in checkpoint:
-                state_dict = checkpoint['model_state_dict']
-            elif 'net_state_dict' in checkpoint:
-                state_dict = checkpoint['net_state_dict']
-            else:
-                state_dict = checkpoint
+                if 'model_state_dict' in checkpoint:
+                    state_dict = checkpoint['model_state_dict']
+                elif 'net_state_dict' in checkpoint:
+                    state_dict = checkpoint['net_state_dict']
+                else:
+                    state_dict = checkpoint
 
-            # Remove 'module.' prefix if present (from DataParallel training)
-            if any(k.startswith('module.') for k in state_dict.keys()):
-                state_dict = {k.replace('module.', ''): v for k, v in state_dict.items()}
+                if any(k.startswith('module.') for k in state_dict.keys()):
+                    state_dict = {k.replace('module.', ''): v for k, v in state_dict.items()}
 
-            self.seg_model.load_state_dict(state_dict)
-            self.seg_model.to(self.device)
-            self.seg_model.eval()
+                self.seg_model.load_state_dict(state_dict)
+                self.seg_model.to(self.device)
+                self.seg_model.eval()
+                print("✓ Tooth segmentation model loaded")
+            except Exception as e:
+                print(f"Warning: Could not load segmentation model: {e}")
+                print("Will use fallback color-based segmentation")
+                self.seg_model = None
+        else:
+            print("Tooth segmentation model not provided - using fallback method")
 
         print("✓ Veneer generator initialized successfully!")
 
@@ -115,24 +103,56 @@ class VeneerControlNetGenerator:
             PIL Image of segmentation mask
         """
         if self.seg_model is None:
-            raise ValueError("Segmentation model not loaded. Provide segmentation_checkpoint.")
+            print("Warning: Using fallback color-based segmentation")
+            image_resized = image.resize(target_size, Image.LANCZOS)
+            img_array = np.array(image_resized)
 
-        # Resize image
+            # Convert to HSV and LAB for better tooth detection
+            hsv = cv2.cvtColor(img_array, cv2.COLOR_RGB2HSV)
+            lab = cv2.cvtColor(img_array, cv2.COLOR_RGB2LAB)
+
+            # Very restrictive white detection (only bright teeth, not skin/lips)
+            # Teeth are typically: high value, low saturation, high L channel
+            lower_white = np.array([0, 0, 200])  # Raised from 180 - only very bright regions
+            upper_white = np.array([180, 25, 255])  # Reduced saturation from 30
+            mask_hsv = cv2.inRange(hsv, lower_white, upper_white)
+
+            # Additional LAB filter to catch tooth enamel specifically
+            lower_lab = np.array([200, 120, 120])  # High L (brightness), neutral a,b
+            upper_lab = np.array([255, 140, 140])
+            mask_lab = cv2.inRange(lab, lower_lab, upper_lab)
+
+            # Combine masks (AND operation for strictness)
+            mask = cv2.bitwise_and(mask_hsv, mask_lab)
+
+            # Morphological operations to clean up noise and small regions
+            kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+            mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)  # Remove noise
+            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)  # Fill gaps
+
+            # Erode slightly to avoid lip edges
+            kernel_erode = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+            mask = cv2.erode(mask, kernel_erode, iterations=1)
+
+            print(f"Fallback mask coverage: {np.sum(mask > 0) / mask.size * 100:.1f}% of image")
+
+            return Image.fromarray(mask, mode='L')
+
+        # Use trained segmentation model
         image = image.resize(target_size, Image.LANCZOS)
-
-        # Convert to tensor
         img_array = np.array(image)
         img_tensor = torch.from_numpy(img_array).permute(2, 0, 1).float()
         img_tensor = img_tensor.unsqueeze(0) / 255.0
         img_tensor = img_tensor.to(self.device)
 
-        # Generate mask
         with torch.no_grad():
             output = self.seg_model(img_tensor)
             mask = torch.sigmoid(output) > 0.5
             mask = mask.squeeze().cpu().numpy().astype(np.uint8) * 255
 
+        print(f"Model mask coverage: {np.sum(mask > 0) / mask.size * 100:.1f}% of image")
         return Image.fromarray(mask, mode='L')
+
 
     def generate_edge_map(self, image, low_threshold=100, high_threshold=200):
         """
@@ -170,7 +190,7 @@ class VeneerControlNetGenerator:
             PIL Image for ControlNet conditioning
         """
         # Generate mask if not provided
-        if mask is None and self.seg_model is not None:
+        if mask is None:
             mask = self.generate_segmentation_mask(image)
 
         # Generate edges
@@ -203,9 +223,10 @@ class VeneerControlNetGenerator:
         prompt=None,
         negative_prompt=None,
         num_inference_steps=20,
-        guidance_scale=7.5,
+        guidance_scale=5.5,
         controlnet_conditioning_scale=1.0,
-        seed=None
+        seed=None,
+        debug_dir=None
     ):
         """
         Generate veneer preview for an input smile image.
@@ -215,9 +236,10 @@ class VeneerControlNetGenerator:
             prompt: Text prompt (optional, uses default if None)
             negative_prompt: Negative prompt
             num_inference_steps: Number of denoising steps
-            guidance_scale: Classifier-free guidance scale
+            guidance_scale: Classifier-free guidance scale (lowered to 5.5 to reduce hallucinations)
             controlnet_conditioning_scale: How much to follow conditioning
             seed: Random seed for reproducibility
+            debug_dir: Directory to save debug images (optional)
 
         Returns:
             PIL Image of veneer preview
@@ -230,16 +252,31 @@ class VeneerControlNetGenerator:
         target_size = (512, 512)
         image = image.resize(target_size, Image.LANCZOS)
 
-        # Create conditioning image
-        conditioning_image = self.create_conditioning_image(image, use_edges=True)
+        # Generate tooth segmentation mask
+        tooth_mask = self.generate_segmentation_mask(image, target_size)
 
-        # Default prompt
+        # Save debug images if requested
+        if debug_dir:
+            debug_path = Path(debug_dir)
+            debug_path.mkdir(parents=True, exist_ok=True)
+            tooth_mask.save(debug_path / 'tooth_mask.png')
+            image.save(debug_path / 'input_resized.png')
+            print(f"Debug: Saved mask to {debug_path / 'tooth_mask.png'}")
+
+        # Create conditioning image for ControlNet
+        conditioning_image = self.create_conditioning_image(image, mask=tooth_mask, use_edges=True)
+
+        if debug_dir:
+            conditioning_image.save(Path(debug_dir) / 'conditioning.png')
+            print(f"Debug: Saved conditioning image to {Path(debug_dir) / 'conditioning.png'}")
+
+        # Conservative clinical prompt (avoid creative language)
         if prompt is None:
-            prompt = "professional dental veneers, perfect white teeth, beautiful smile, high quality, photorealistic, detailed"
+            prompt = "natural dental veneers applied only to existing tooth enamel, realistic tooth anatomy, proper dental occlusion, natural enamel texture, photorealistic dentistry"
 
-        # Default negative prompt
+        # Strong negative prompt to prevent distortion
         if negative_prompt is None:
-            negative_prompt = "blurry, low quality, distorted, deformed teeth, unnatural, artifacts"
+            negative_prompt = "distorted mouth, modified lips, altered gums, changed lip shape, extra teeth, melted teeth, deformed anatomy, plastic texture, artificial look, cartoon, surreal, exaggerated features, face modification, skin changes"
 
         # Set seed
         if seed is not None:
@@ -250,13 +287,17 @@ class VeneerControlNetGenerator:
         # Generate
         print(f"Generating veneer preview...")
         print(f"  Prompt: {prompt}")
+        print(f"  Negative: {negative_prompt[:80]}...")
         print(f"  Steps: {num_inference_steps}")
         print(f"  Guidance: {guidance_scale}")
 
+        # Use inpainting pipeline with mask
         output = self.pipe(
             prompt=prompt,
             negative_prompt=negative_prompt,
-            image=conditioning_image,
+            image=image,  # Original image for inpainting
+            mask_image=tooth_mask,  # Mask of teeth region
+            control_image=conditioning_image,  # ControlNet conditioning
             num_inference_steps=num_inference_steps,
             guidance_scale=guidance_scale,
             controlnet_conditioning_scale=controlnet_conditioning_scale,
@@ -264,6 +305,10 @@ class VeneerControlNetGenerator:
         )
 
         result_image = output.images[0]
+
+        if debug_dir:
+            result_image.save(Path(debug_dir) / 'output.png')
+            print(f"Debug: Saved output to {Path(debug_dir) / 'output.png'}")
 
         return result_image
 
@@ -358,7 +403,7 @@ def main():
     parser.add_argument(
         '--guidance',
         type=float,
-        default=7.5,
+        default=5.5,
         help='Guidance scale'
     )
     parser.add_argument(
@@ -378,6 +423,12 @@ def main():
         default='cuda',
         choices=['cuda', 'cpu'],
         help='Device to use'
+    )
+    parser.add_argument(
+        '--debug-dir',
+        type=str,
+        default=None,
+        help='Directory to save debug outputs (mask, conditioning, etc.)'
     )
 
     args = parser.parse_args()
@@ -399,7 +450,8 @@ def main():
             negative_prompt=args.negative_prompt,
             num_inference_steps=args.steps,
             guidance_scale=args.guidance,
-            seed=args.seed
+            seed=args.seed,
+            debug_dir=args.debug_dir
         )
     else:
         image = Image.open(args.image).convert('RGB')
@@ -409,7 +461,8 @@ def main():
             negative_prompt=args.negative_prompt,
             num_inference_steps=args.steps,
             guidance_scale=args.guidance,
-            seed=args.seed
+            seed=args.seed,
+            debug_dir=args.debug_dir
         )
         result.save(args.output, quality=95)
         print(f"✓ Veneer preview saved to {args.output}")

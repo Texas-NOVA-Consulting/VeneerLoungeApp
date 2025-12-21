@@ -28,7 +28,7 @@ from tqdm.auto import tqdm
 
 from diffusers import (
     ControlNetModel,
-    StableDiffusionControlNetPipeline,
+    StableDiffusionControlNetInpaintPipeline,
     UNet2DConditionModel,
     DDPMScheduler,
     AutoencoderKL
