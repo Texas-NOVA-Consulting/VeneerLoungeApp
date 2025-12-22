@@ -7,7 +7,7 @@ from pathlib import Path
 import sys
 import torch
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageFilter
 import cv2
 from diffusers import ControlNetModel, StableDiffusionControlNetInpaintPipeline, UniPCMultistepScheduler
 
@@ -43,7 +43,7 @@ class VeneerControlNetGenerator:
             safety_checker=None
         )
 
-        self.pipe.scheduler = UniPCMultistepScheduler.from_config(self.pipe.scheduler.config)
+        self.pipe.scheduler = UniPCMultistepScheduler.from_config(self.pipe.scheduler.config, use_karras_sigmas=True)
         self.pipe = self.pipe.to(self.device)
 
         if self.device.type == 'cuda':
@@ -156,7 +156,6 @@ class VeneerControlNetGenerator:
         x0, y0 = offset
         final = original.copy()
         mask_np = np.array(mask)
-        mask_Np = cv2.GaussianBlur(mask_np, (9, 9), 0)
         mask = Image.fromarray(mask_np, mode='L')
         final.paste(generated_crop, (x0, y0), mask=mask)
         return final
@@ -215,8 +214,8 @@ class VeneerControlNetGenerator:
         image,
         prompt=None,
         negative_prompt=None,
-        num_inference_steps=20,
-        guidance_scale=4.0,
+        num_inference_steps=30,
+        guidance_scale=3.5,
         controlnet_conditioning_scale=0.6,
         seed=None,
         debug_dir=None
@@ -242,14 +241,17 @@ class VeneerControlNetGenerator:
         original_image = image.copy()
         orig_w, orig_h = original_image.size
 
-        image = image.resize((512, 512), Image.LANCZOS)
+        crop_img, crop_mask, offset = self.crop_to_mouth(image, self.generate_segmentation_mask(image))
+        GEN_SIZE = 768
+        sd_crop_img = crop_img.resize((GEN_SIZE, GEN_SIZE), Image.LANCZOS)
+        sd_crop_mask = crop_mask.resize((GEN_SIZE, GEN_SIZE), Image.NEAREST)
         tooth_mask = self.generate_segmentation_mask(image)
         tooth_mask = self.refine_tooth_mask(tooth_mask)
         tooth_mask = Image.fromarray(cv2.erode(np.array(tooth_mask), np.ones((8,8), np.uint8), iterations=1), mode="L")
         crop_img, crop_mask, offset = self.crop_to_mouth(image, tooth_mask)
         orig_crop_size = crop_img.size
-        sd_crop_img = crop_img.resize((512, 512), Image.LANCZOS)
-        sd_crop_mask = crop_mask.resize((512, 512), Image.LANCZOS)
+        sd_crop_img = crop_img.resize((GEN_SIZE, GEN_SIZE), Image.LANCZOS)
+        sd_crop_mask = crop_mask.resize((GEN_SIZE, GEN_SIZE), Image.NEAREST)
         if debug_dir:
             sd_crop_img.save(Path(debug_dir) / 'cropped.png')
         #generate edges only on the cropped region
@@ -278,7 +280,7 @@ class VeneerControlNetGenerator:
             generator = torch.Generator(device=self.device).manual_seed(seed)
         else:
             generator = None
-
+            
         output = self.pipe(
             prompt=prompt,
             negative_prompt=negative_prompt,
@@ -289,7 +291,7 @@ class VeneerControlNetGenerator:
             guidance_scale=guidance_scale,
             controlnet_conditioning_scale=controlnet_conditioning_scale,
             generator=generator,
-            strength=0.35
+            strength=0.15
         )
 
         generated_sd = output.images[0]
@@ -300,7 +302,9 @@ class VeneerControlNetGenerator:
         if debug_dir:
             result_image.save(Path(debug_dir) / 'output.png')
             print(f"Debug: Saved output to {Path(debug_dir) / 'output.png'}")
-
+        result_image = result_image.filter(
+            ImageFilter.UnsharpMask(1.2, 120, 3)
+        )
         return result_image
 
     def generate_comparison(self, image, output_path=None, **kwargs):
