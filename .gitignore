@@ -34,7 +34,7 @@ data/
 *.pkl
 
 # Folders
-debug_outputs
+debug_outputs/
 
 # Model Checkpoints and Weights
 *.pth
