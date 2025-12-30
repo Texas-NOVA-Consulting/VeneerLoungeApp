@@ -248,6 +248,25 @@ class VeneerControlNetGenerator:
         tooth_mask = self.generate_segmentation_mask(image)
         tooth_mask = self.refine_tooth_mask(tooth_mask)
         tooth_mask = Image.fromarray(cv2.erode(np.array(tooth_mask), np.ones((8,8), np.uint8), iterations=1), mode="L")
+
+
+        # ADDITONAL MASK PROCESSING: GATING LOWER HALF TO AVOID CHANING FACIAL FEATURES
+        mask_np = np.array(tooth_mask)
+        h, w = mask_np.shape
+
+        gate = np.zeros_like(mask_np, dtype=np.uint8)
+        
+        # Change this gate to be more dynamic, using user input (coordinates of mouth region)
+        
+        gate[int(0.4 * h):, :] = 255  # bottom 60%
+
+        mask_np = cv2.bitwise_and(mask_np, gate)
+        mask_np = cv2.GaussianBlur(mask_np, (31, 31), 0)
+        tooth_mask = Image.fromarray(mask_np, mode="L")
+
+        tooth_mask.save("debug_outputs/gated_tooth_mask.png")
+        # END ADDITONAL MASK PROCESSING
+
         crop_img, crop_mask, offset = self.crop_to_mouth(image, tooth_mask)
         orig_crop_size = crop_img.size
         sd_crop_img = crop_img.resize((GEN_SIZE, GEN_SIZE), Image.LANCZOS)

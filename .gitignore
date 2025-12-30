@@ -90,6 +90,9 @@ tmp/
 temp/
 *.tmp
 
+# Frontend Build Artifacts
+.next/
+
 # Large Media Files (optional - uncomment if needed)
 # *.mp4
 # *.avi
