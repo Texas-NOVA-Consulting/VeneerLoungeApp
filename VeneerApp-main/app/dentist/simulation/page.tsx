@@ -10,6 +10,7 @@ import Link from "next/link"
 import { useToast } from "@/hooks/use-toast"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
+import { BoundingBoxSelector } from "@/components/bounding-selector";
 
 export default function DentistSimulationPage() {
   const [selectedShade, setSelectedShade] = useState("natural_white")
@@ -20,6 +21,13 @@ export default function DentistSimulationPage() {
   const [patientId, setPatientId] = useState("")
   const searchParams = useSearchParams()
   const { toast } = useToast()
+
+  const [boundingBox, setBoundingBox] = useState< {
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  } | null>(null);
 
   const [originalImage, setOriginalImage] = useState<string>("/placeholder.svg?height=600&width=800")
 
@@ -49,6 +57,7 @@ export default function DentistSimulationPage() {
           image: originalImage,
           shade: selectedShade,
           numOutputs: numVariations,
+          boundingBox: boundingBox,
         }),
       })
 
@@ -170,6 +179,17 @@ export default function DentistSimulationPage() {
             <div className="glass rounded-2xl p-6">
               <VeneerShadeSelector onShadeSelect={setSelectedShade} selectedShade={selectedShade} />
             </div>
+
+            {/* Mouth Region Selection */}
+            {originalImage && !originalImage.startsWith('/placeholder') && (
+              <div className="glass rounded-2xl p-6">
+                <BoundingBoxSelector
+                  imageUrl={originalImage}
+                  onBoundingBoxChange={setBoundingBox}
+                  initialBox={boundingBox}
+                />
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className="flex gap-3">
