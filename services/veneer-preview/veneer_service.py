@@ -111,6 +111,7 @@ class VeneerPreviewService:
         intensity=0.8,
         preserve_geometry=False,
         custom_prompt=None,
+        bounding_box=None,
         **kwargs
     ):
         """
@@ -129,7 +130,7 @@ class VeneerPreviewService:
         """
         if self.model_type == 'controlnet':
             return self._generate_controlnet(
-                image, intensity, preserve_geometry, custom_prompt, **kwargs
+                image, intensity, preserve_geometry, custom_prompt, bounding_box, **kwargs
             )
         elif self.model_type == 'pix2pix':
             return self._generate_pix2pix(image, intensity, **kwargs)
@@ -140,24 +141,22 @@ class VeneerPreviewService:
         intensity,
         preserve_geometry,
         custom_prompt,
+        bounding_box,
         **kwargs
     ):
         # Lower guidance to reduce hallucinations and distortion
         if preserve_geometry:
             controlnet_scale = 1.2
-            guidance_scale = 5.0  # Lowered from 7.5
+            guidance_scale = 5.0
         else:
             controlnet_scale = 0.9
-            guidance_scale = 5.5  # Lowered from 8.0
+            guidance_scale = 5.5
 
-        # Use conservative clinical prompts unless custom provided
         if custom_prompt is None:
             if preserve_geometry:
-                # Focus on minimal changes, preserve tooth position
-                prompt = "natural dental veneers applied only to existing tooth enamel, realistic tooth anatomy, maintain tooth position, natural enamel texture, photorealistic dentistry"
+                prompt = "natural dental veneers, realistic tooth anatomy, maintain tooth position, uniform tooth structure, natural enamel texture, photorealistic dentistry"
             else:
-                # Allow some alignment but stay clinical
-                prompt = "natural dental veneers applied only to existing tooth enamel, realistic tooth anatomy, proper dental occlusion, natural enamel texture, photorealistic dentistry"
+                prompt = "natural dental veneers, realistic tooth anatomy, proper dental occlusion, uniform tooth structure, natural enamel texture, photorealistic dentistry"
         else:
             prompt = custom_prompt
 
@@ -173,22 +172,15 @@ class VeneerPreviewService:
             guidance_scale=guidance_scale,
             controlnet_conditioning_scale=controlnet_scale,
             seed=kwargs.get('seed', None),
-            debug_dir=str(debug_dir)
+            debug_dir=str(debug_dir),
+            bounding_box=bounding_box
         )
 
         return result
 
     def _generate_pix2pix(self, image, intensity, **kwargs):
         """
-        Generate using Pix2pix.
-
-        Args:
-            image: PIL Image
-            intensity: Not used for Pix2pix (always generates full transformation)
-            **kwargs: Additional arguments (ignored for Pix2pix)
-
-        Returns:
-            PIL Image of veneer preview
+        Unimplemented for now
         """
         result = self.generator.generate(image, return_pil=True)
         return result
@@ -199,6 +191,7 @@ class VeneerPreviewService:
         intensity=0.8,
         preserve_geometry=False,
         custom_prompt=None,
+        bounding_box=None,
         return_format='base64',
         **kwargs
     ):
@@ -232,6 +225,7 @@ class VeneerPreviewService:
                 intensity=intensity,
                 preserve_geometry=preserve_geometry,
                 custom_prompt=custom_prompt,
+                bounding_box=bounding_box,
                 **kwargs
             )
 

@@ -3,10 +3,6 @@ import { type NextRequest, NextResponse } from "next/server"
 export async function POST(request: NextRequest) {
   try {
     const { image, shade, numOutputs, boundingBox } = await request.json()
-    console.log('DEBUG: image type:', typeof image);
-    console.log('DEBUG: image length:', image?.length);
-    console.log('DEBUG: image starts with:', image?.substring(0, 50));
-    console.log('DEBUG: has data URI prefix:', image?.startsWith('data:'));
     if (!image) {
       return NextResponse.json({ error: "Image is required" }, { status: 400 })
     }

@@ -5,7 +5,6 @@ import { VeneerShadeSelector } from "@/components/veneer-shade-selector"
 import { SimulationLoading } from "@/components/simulation-loading"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Download, FileText, Share2 } from "lucide-react"
-import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { useToast } from "@/hooks/use-toast"
 import { Label } from "@/components/ui/label"
@@ -19,7 +18,6 @@ export default function DentistSimulationPage() {
   const [simulatedImages, setSimulatedImages] = useState<string[]>([])
   const [patientName, setPatientName] = useState("")
   const [patientId, setPatientId] = useState("")
-  const searchParams = useSearchParams()
   const { toast } = useToast()
 
   const [boundingBox, setBoundingBox] = useState< {

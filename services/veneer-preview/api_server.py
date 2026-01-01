@@ -95,19 +95,6 @@ def health_check():
 def generate_preview():
     """
     Generate veneer preview from base64 encoded image.
-    Request body:
-        {
-            "image": "data:image/jpeg;base64,...",
-            "intensity": 0.8 (optional),
-            "preserve_geometry": false (optional),
-            "custom_prompt": "..." (optional, ControlNet only)
-        }
-
-    Returns:
-        {
-            "output": ["data:image/jpeg;base64,..."],
-            "success": true
-        }
     """
     try:
         logger.info("=== Starting veneer preview generation ===")
@@ -121,6 +108,7 @@ def generate_preview():
             }), 400
 
         logger.info("Step 1: Request received, parsing parameters")
+
         image_base64 = data['image']
         if image_base64.startswith("data:"):
             image_base64 = image_base64.split(",", 1)[1]
@@ -128,9 +116,7 @@ def generate_preview():
         intensity = data.get('intensity', 0.8)
         preserve_geometry = data.get('preserve_geometry', False)
         custom_prompt = data.get('custom_prompt', None)
-
-        logger.info(f"Parameters: intensity={intensity}, preserve_geometry={preserve_geometry}")
-        logger.info(f"Image data length: {len(image_base64) if image_base64 else 0}")
+        bounding_box = data.get('bounding_box', None)
 
         if not 0 <= intensity <= 1:
             logger.error(f"Invalid intensity value: {intensity}")
@@ -141,7 +127,6 @@ def generate_preview():
 
         logger.info("Step 2: Getting service instance")
         service = get_service()
-        logger.info(f"Service loaded: {service.model_type} on {service.device}")
 
         logger.info("Step 3: Calling generate_from_base64")
         # Generate preview
@@ -149,7 +134,8 @@ def generate_preview():
             base64_image=image_base64,
             intensity=intensity,
             preserve_geometry=preserve_geometry,
-            custom_prompt=custom_prompt
+            custom_prompt=custom_prompt,
+            bounding_box=bounding_box
         )
         logger.info("Step 4: Generation complete, returning result")
         return jsonify({

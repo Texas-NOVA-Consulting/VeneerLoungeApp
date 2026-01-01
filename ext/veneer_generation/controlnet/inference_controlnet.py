@@ -7,13 +7,15 @@ from pathlib import Path
 import sys
 import torch
 import numpy as np
-from PIL import Image, ImageFilter
+from PIL import Image
+import logging
 import cv2
 from diffusers import ControlNetModel, StableDiffusionControlNetInpaintPipeline, UniPCMultistepScheduler
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / 'individual_tooth_segmentation'))
 from src.network.model import ResNeSt50_TC as TeethSegmentationNet
 
+logger = logging.getLogger(__name__)
 
 class VeneerControlNetGenerator:
 
@@ -43,7 +45,7 @@ class VeneerControlNetGenerator:
             safety_checker=None
         )
 
-        self.pipe.scheduler = UniPCMultistepScheduler.from_config(self.pipe.scheduler.config, use_karras_sigmas=True)
+        self.pipe.scheduler = UniPCMultistepScheduler.from_config(self.pipe.scheduler.config)
         self.pipe = self.pipe.to(self.device)
 
         if self.device.type == 'cuda':
@@ -156,6 +158,7 @@ class VeneerControlNetGenerator:
         x0, y0 = offset
         final = original.copy()
         mask_np = np.array(mask)
+        mask_Np = cv2.GaussianBlur(mask_np, (9, 9), 0)
         mask = Image.fromarray(mask_np, mode='L')
         final.paste(generated_crop, (x0, y0), mask=mask)
         return final
@@ -214,11 +217,12 @@ class VeneerControlNetGenerator:
         image,
         prompt=None,
         negative_prompt=None,
-        num_inference_steps=30,
-        guidance_scale=3.5,
+        num_inference_steps=20,
+        guidance_scale=4.0,
         controlnet_conditioning_scale=0.6,
         seed=None,
-        debug_dir=None
+        debug_dir=None,
+        bounding_box=None
     ):
         """
         Generate veneer preview for an input smile image.
@@ -232,47 +236,73 @@ class VeneerControlNetGenerator:
             controlnet_conditioning_scale: How much to follow conditioning
             seed: Random seed for reproducibility
             debug_dir: Directory to save debug images (optional)
+            bounding_box: bounding box for mouth region
         Returns:
             PIL Image of veneer preview
         """
         # Load image if path
         if isinstance(image, (str, Path)):
             image = Image.open(image).convert('RGB')
-        original_image = image.copy()
-        orig_w, orig_h = original_image.size
+        output_image = image.copy()
+        orig_w, orig_h = output_image.size
 
-        crop_img, crop_mask, offset = self.crop_to_mouth(image, self.generate_segmentation_mask(image))
-        GEN_SIZE = 768
-        sd_crop_img = crop_img.resize((GEN_SIZE, GEN_SIZE), Image.LANCZOS)
-        sd_crop_mask = crop_mask.resize((GEN_SIZE, GEN_SIZE), Image.NEAREST)
+        #default use bottom 40% of image
+        x1, y1, x2, y2 = 0, int(orig_h * 0.6), int(orig_w), int(orig_h)
+
+        if bounding_box:
+            #extracting bounding box coordinates
+            x, y = bounding_box['x'], bounding_box['y']
+            width, height = bounding_box['width'], bounding_box['height']
+
+            x1, y1 = int(x/100.0 * orig_w), int(y/100.0 * orig_h)
+            x2, y2 = int((x + width)/100.0 * orig_w), int((y + height)/100.0 * orig_h)
+            x1 = max(0, min(orig_w, x1))
+            y1 = max(0, min(orig_h, y1))
+            x2 = max(0, min(orig_w, x2))
+            y2 = max(0, min(orig_h, y2))
+
+        image = image.crop((x1, y1, x2, y2))
+        orig_w, orig_h = image.size
+        image = image.resize((512, 512), Image.LANCZOS)
+
+        # Try to generate tooth mask via segmentation
         tooth_mask = self.generate_segmentation_mask(image)
-        tooth_mask = self.refine_tooth_mask(tooth_mask)
-        tooth_mask = Image.fromarray(cv2.erode(np.array(tooth_mask), np.ones((8,8), np.uint8), iterations=1), mode="L")
+        tooth_mask_np = np.array(tooth_mask)
 
+        # If segmentation failed (mask is mostly empty), create a simple center rectangle mask
+        if tooth_mask_np.mean() < 10:  # Very little white detected
+            print("Warning: Tooth segmentation failed, using rectangular fallback mask")
+            tooth_mask_np = np.zeros((512, 512), dtype=np.uint8)
+            # Create a mask covering center 70% width, 40% height (typical mouth region)
+            h_start, h_end = int(512 * 0.3), int(512 * 0.7)
+            w_start, w_end = int(512 * 0.15), int(512 * 0.85)
+            tooth_mask_np[h_start:h_end, w_start:w_end] = 255
+            tooth_mask = Image.fromarray(tooth_mask_np, mode="L")
+        else:
+            tooth_mask = self.refine_tooth_mask(tooth_mask)
+            tooth_mask = Image.fromarray(cv2.erode(np.array(tooth_mask), np.ones((8,8), np.uint8), iterations=1), mode="L")
 
-        # ADDITONAL MASK PROCESSING: GATING LOWER HALF TO AVOID CHANING FACIAL FEATURES
         mask_np = np.array(tooth_mask)
         h, w = mask_np.shape
 
-        gate = np.zeros_like(mask_np, dtype=np.uint8)
-        
-        # Change this gate to be more dynamic, using user input (coordinates of mouth region)
-        
-        gate[int(0.4 * h):, :] = 255  # bottom 60%
-
+        gate = np.ones_like(mask_np, dtype=np.uint8) * 255
         mask_np = cv2.bitwise_and(mask_np, gate)
-        mask_np = cv2.GaussianBlur(mask_np, (31, 31), 0)
+        mask_np = cv2.GaussianBlur(mask_np, (5, 5), 0)
         tooth_mask = Image.fromarray(mask_np, mode="L")
 
-        tooth_mask.save("debug_outputs/gated_tooth_mask.png")
-        # END ADDITONAL MASK PROCESSING
+        if debug_dir:
+            tooth_mask.save(Path(debug_dir) / "gated_tooth_mask.png")
+            print(f"Debug: Mask stats - min={mask_np.min()}, max={mask_np.max()}, mean={mask_np.mean():.1f}")
 
-        crop_img, crop_mask, offset = self.crop_to_mouth(image, tooth_mask)
-        orig_crop_size = crop_img.size
-        sd_crop_img = crop_img.resize((GEN_SIZE, GEN_SIZE), Image.LANCZOS)
-        sd_crop_mask = crop_mask.resize((GEN_SIZE, GEN_SIZE), Image.NEAREST)
+        offset = (x1, y1)
+        crop_img, crop_mask = image, tooth_mask
+        cropped_w, cropped_h = crop_img.size
+        sd_crop_img = crop_img.resize((512, 512), Image.LANCZOS)
+        sd_crop_mask = crop_mask.resize((512, 512), Image.LANCZOS)
+
         if debug_dir:
             sd_crop_img.save(Path(debug_dir) / 'cropped.png')
+        
         #generate edges only on the cropped region
         edges = self.generate_edge_map(sd_crop_img)
         edges_np = np.array(edges)
@@ -284,13 +314,11 @@ class VeneerControlNetGenerator:
             debug_path.mkdir(parents=True, exist_ok=True)
             tooth_mask.save(debug_path / 'tooth_mask.png')
             image.save(debug_path / 'input_resized.png')
-
-        if debug_dir:
-            conditioning_image.save(Path(debug_dir) / 'conditioning.png')
-            print(f"Debug: Saved conditioning image to {Path(debug_dir) / 'conditioning.png'}")
+            conditioning_image.save(debug_path / 'conditioning_edges.png')
+            sd_crop_mask.save(debug_path / 'mask_512x512.png')
 
         if prompt is None:
-            prompt = "natural dental veneers applied only to existing tooth enamel, realistic tooth anatomy, proper dental occlusion, natural enamel texture, photorealistic dentistry"
+            prompt = "natural dental veneers, realistic tooth anatomy, maintain tooth position, uniform tooth structure, natural enamel texture, photorealistic dentistry"
 
         if negative_prompt is None:
             negative_prompt = "distorted mouth, modified lips, altered gums, changed lip shape, extra teeth, melted teeth, deformed anatomy, plastic texture, artificial look, cartoon, surreal, exaggerated features, face modification, skin changes"
@@ -299,7 +327,7 @@ class VeneerControlNetGenerator:
             generator = torch.Generator(device=self.device).manual_seed(seed)
         else:
             generator = None
-            
+
         output = self.pipe(
             prompt=prompt,
             negative_prompt=negative_prompt,
@@ -310,21 +338,25 @@ class VeneerControlNetGenerator:
             guidance_scale=guidance_scale,
             controlnet_conditioning_scale=controlnet_conditioning_scale,
             generator=generator,
-            strength=0.15
+            strength=0.35
         )
 
         generated_sd = output.images[0]
-        generated_crop = generated_sd.resize(orig_crop_size, Image.LANCZOS)
-        final_mask = crop_mask.resize(orig_crop_size, Image.LANCZOS)
-        result_image = self.composite_back(original=image, generated_crop=generated_crop, mask=final_mask, offset=offset)
-        result_image = result_image.resize((orig_w, orig_h), Image.LANCZOS)
+
+        # Resize generated image back to the original bounding box dimensions
+        bbox_w, bbox_h = x2 - x1, y2 - y1
+        generated_crop = generated_sd.resize((bbox_w, bbox_h), Image.LANCZOS)
+
         if debug_dir:
-            result_image.save(Path(debug_dir) / 'output.png')
-            print(f"Debug: Saved output to {Path(debug_dir) / 'output.png'}")
-        result_image = result_image.filter(
-            ImageFilter.UnsharpMask(1.2, 120, 3)
-        )
-        return result_image
+            generated_sd.save(Path(debug_dir) / 'generated_512x512.png')
+            generated_crop.save(Path(debug_dir) / 'generated_resized.png')
+
+        # Paste the generated region back into the original image at the bounding box position
+        output_image.paste(generated_crop, (x1, y1))
+
+        if debug_dir:
+            output_image.save(Path(debug_dir) / 'output.png')
+        return output_image
 
     def generate_comparison(self, image, output_path=None, **kwargs):
         """
@@ -405,7 +437,7 @@ def main():
     parser.add_argument(
         '--steps',
         type=int,
-        default=20,
+        default=30,
         help='Number of inference steps'
     )
     parser.add_argument(
@@ -434,8 +466,6 @@ def main():
     )
 
     args = parser.parse_args()
-
-    # Create generator
     generator = VeneerControlNetGenerator(
         controlnet_path=args.controlnet,
         base_model_path=args.base_model,
@@ -443,7 +473,6 @@ def main():
         device=args.device
     )
 
-    # Generate preview
     if args.comparison:
         result = generator.generate_comparison(
             image=args.image,

@@ -70,16 +70,12 @@ export function BoundingBoxSelector({ imageUrl, onBoundingBoxChange, initialBox 
     };
 
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-        // CRITICAL: Stop ALL propagation
         e.preventDefault();
         e.stopPropagation();
         e.nativeEvent.preventDefault();
         e.nativeEvent.stopImmediatePropagation();
 
         const pos = getRelativePos(e);
-        console.log('🖱️ Mouse down at:', pos);
-
-        // Check if clicking inside existing box
         if (box) {
             const inBox =
                 pos.x >= box.x &&
@@ -88,15 +84,12 @@ export function BoundingBoxSelector({ imageUrl, onBoundingBoxChange, initialBox 
                 pos.y <= box.y + box.height;
 
             if (inBox) {
-                console.log('📦 Dragging existing box');
                 setIsDragging(true);
                 setStartPos({x: pos.x - box.x, y: pos.y - box.y});
                 return;
             }
         }
 
-        // Start drawing new box
-        console.log('✏️ Drawing new box');
         setIsDrawing(true);
         setStartPos(pos);
         setBox({x: pos.x, y: pos.y, width: 0, height: 0});
@@ -135,12 +128,10 @@ export function BoundingBoxSelector({ imageUrl, onBoundingBoxChange, initialBox 
     };
 
     const handleMouseUp = () => {
-        console.log('🔼 Mouse up');
         setIsDrawing(false);
         setIsDragging(false);
 
         if (box && box.width > 1 && box.height > 1) {
-            console.log('💾 Saving box:', box);
             onBoundingBoxChange(box);
         }
     };
