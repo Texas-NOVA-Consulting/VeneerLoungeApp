@@ -147,16 +147,20 @@ class VeneerPreviewService:
         # Lower guidance to reduce hallucinations and distortion
         if preserve_geometry:
             controlnet_scale = 1.2
-            guidance_scale = 5.0
+            guidance_scale = 3.5
         else:
             controlnet_scale = 0.9
-            guidance_scale = 5.5
+            guidance_scale = 3.5
 
         if custom_prompt is None:
             if preserve_geometry:
-                prompt = "natural dental veneers, realistic tooth anatomy, maintain tooth position, uniform tooth structure, natural enamel texture, photorealistic dentistry"
+                prompt = """ultra realistic dental veneers, natural enamel translucency, preserved tooth alignment,
+                            consistent lighting, subtle surface microtexture, photorealistic dentistry,
+                            no change to lips, gums, face, skin, or jaw, teeth only"""
             else:
-                prompt = "natural dental veneers, realistic tooth anatomy, proper dental occlusion, uniform tooth structure, natural enamel texture, photorealistic dentistry"
+                prompt = """ultra realistic dental veneers, natural enamel translucency, preserved tooth alignment,
+                            consistent lighting, subtle surface microtexture, photorealistic dentistry,
+                            no change to lips, gums, face, skin, or jaw, teeth only"""
         else:
             prompt = custom_prompt
 
@@ -168,7 +172,7 @@ class VeneerPreviewService:
         result = self.generator.generate_veneer_preview(
             image=image,
             prompt=prompt,
-            num_inference_steps=kwargs.get('steps', 30),
+            num_inference_steps=kwargs.get('steps', 35),
             guidance_scale=guidance_scale,
             controlnet_conditioning_scale=controlnet_scale,
             seed=kwargs.get('seed', None),
