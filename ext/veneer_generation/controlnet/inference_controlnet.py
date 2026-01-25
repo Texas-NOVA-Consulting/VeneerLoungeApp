@@ -338,7 +338,7 @@ class VeneerControlNetGenerator:
             control_image=conditioning_image,
             num_inference_steps=40,
             guidance_scale=4.0,
-            controlnet_conditioning_scale=0.5,
+            controlnet_conditioning_scale=0.6,
             strength=0.5
         )
 
