@@ -336,10 +336,10 @@ class VeneerControlNetGenerator:
             image=sd_crop_img,
             mask_image=sd_crop_mask,
             control_image=conditioning_image,
-            num_inference_steps=30,
+            num_inference_steps=40,
             guidance_scale=4.0,
             controlnet_conditioning_scale=0.5,
-            strength=0.35
+            strength=0.5
         )
 
         generated_sd = output.images[0]
