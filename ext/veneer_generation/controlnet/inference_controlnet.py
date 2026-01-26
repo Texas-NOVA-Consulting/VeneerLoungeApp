@@ -358,12 +358,15 @@ class VeneerControlNetGenerator:
             conditioning_image.save(debug_path / 'conditioning_edges.png')
 
         if prompt is None:
-            prompt = """natural dental veneers, realistic enamel translucency,
-                        subtle whitening and surface refinement,
-                        maintain overall smile shape,
-                        photorealistic dentistry, teeth only"""
+            prompt = """perfect white dental veneers, bright uniform teeth,
+                        perfectly aligned straight teeth, natural enamel texture,
+                        professional teeth whitening, pristine dental work,
+                        flawless smile, symmetrical teeth, photorealistic"""
         if negative_prompt is None:
-            negative_prompt = """plastic teeth, fake smile, porcelain doll, glowing teeth, overly white, sharp edges, distorted lips, altered gums, uncanny, cartoon, CGI"""
+            negative_prompt = """yellow teeth, stained teeth, crooked teeth, misaligned teeth,
+                                plastic teeth, fake smile, porcelain doll, sharp edges,
+                                distorted lips, altered gums, altered face, uncanny, cartoon, CGI,
+                                gaps between teeth, uneven teeth"""
         if seed is not None:
             generator = torch.Generator(device=self.device).manual_seed(seed)
         else:
@@ -375,10 +378,10 @@ class VeneerControlNetGenerator:
             image=sd_crop_img,
             mask_image=sd_crop_mask,
             control_image=conditioning_image,
-            num_inference_steps=40,
-            guidance_scale=4.0,
-            controlnet_conditioning_scale=0.6,
-            strength=0.45  # Increased from 0.2 to allow more tooth modification
+            num_inference_steps=15,  # Reduced for speed (was 20)
+            guidance_scale=5.5,  # Increased to follow prompt more strongly for perfect teeth
+            controlnet_conditioning_scale=0.75,  # Increased to maintain structure better
+            strength=0.50  # Increased to allow more whitening and alignment
         )
 
         generated_sd = output.images[0]
