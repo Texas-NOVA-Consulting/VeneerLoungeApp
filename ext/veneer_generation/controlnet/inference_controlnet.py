@@ -202,6 +202,42 @@ class VeneerControlNetGenerator:
         refined = cv2.erode(mask_np, kernel, iterations=1)
         return Image.fromarray(refined, mode='L')
 
+    def advanced_feather_mask(self, mask, inner_feather_px=10, outer_feather_px=35):
+        """
+        Two-stage feathering: tight near teeth, wide at boundaries.
+        Better preserves tooth detail while ensuring smooth blending.
+        """
+        mask_np = (np.array(mask) > 0).astype(np.uint8) * 255
+        dist_inner = cv2.distanceTransform(mask_np, cv2.DIST_L2, 5)
+        inner_feather = np.clip(dist_inner / inner_feather_px, 0, 1)
+        inverted = 255 - mask_np
+        dist_outer = cv2.distanceTransform(inverted, cv2.DIST_L2, 5)
+        outer_feather = 1 - np.clip(dist_outer / outer_feather_px, 0, 1)
+        combined = np.minimum(inner_feather, outer_feather)
+
+        return (combined * 255).astype(np.uint8)
+
+    def poisson_blend(self, generated_crop, original, mask, offset):
+        """Seamless cloning using Poisson editing."""
+        x1, y1 = offset
+        x2, y2 = x1 + generated_crop.width, y1 + generated_crop.height
+        mask_np = np.array(mask)
+        _, binary_mask = cv2.threshold(mask_np, 127, 255, cv2.THRESH_BINARY)
+        center = (x1 + generated_crop.width // 2, y1 + generated_crop.height // 2)
+        original_np = np.array(original)
+        generated_np = np.array(generated_crop)
+        
+        result = cv2.seamlessClone(
+            generated_np, 
+            original_np, 
+            binary_mask, 
+            center, 
+            cv2.NORMAL_CLONE  # we can tr MIXED_CLONE if NORMAL is too strong
+        )
+        
+        return Image.fromarray(result)
+
+
     def generate_veneer_preview(
         self,
         image,
@@ -278,7 +314,7 @@ class VeneerControlNetGenerator:
         gate = np.ones_like(mask_np, dtype=np.uint8) * 255
         mask_np = cv2.bitwise_and(mask_np, gate)
         #mask_np = cv2.GaussianBlur(mask_np, (5, 5), 0)
-        mask_np = self.feather_mask(mask_np, feather_px=30)
+        mask_np = self.advanced_feather_mask(tooth_mask, inner_feather_px=10, outer_feather_px=35)
         tooth_mask = Image.fromarray(mask_np, mode="L")
 
         if debug_dir:
@@ -339,7 +375,7 @@ class VeneerControlNetGenerator:
             num_inference_steps=40,
             guidance_scale=4.0,
             controlnet_conditioning_scale=0.6,
-            strength=0.5
+            strength=0.2
         )
 
         generated_sd = output.images[0]
@@ -358,14 +394,15 @@ class VeneerControlNetGenerator:
         original_crop = output_image.crop((x1, y1, x2, y2))
         generated_crop = self.match_color(generated_crop, original_crop)
 
-        # Paste the generated region back into the original image at the bounding box position
+        # Prepare final mask for Poisson blending
         final_mask = sd_crop_mask.resize((bbox_w, bbox_h), Image.LANCZOS)
         # Feather mask again at final resolution
         mask_np = np.array(final_mask)
         mask_np = cv2.GaussianBlur(mask_np, (31, 31), 0)
         final_mask = Image.fromarray(mask_np, mode="L")
 
-        output_image.paste(generated_crop, (x1, y1), mask=final_mask)
+        # Use Poisson blending for seamless integration
+        output_image = self.poisson_blend(generated_crop, output_image, final_mask, (x1, y1))
 
         if debug_dir:
             output_image.save(Path(debug_dir) / 'output.png')
