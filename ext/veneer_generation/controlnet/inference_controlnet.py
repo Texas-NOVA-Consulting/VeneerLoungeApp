@@ -305,8 +305,9 @@ class VeneerControlNetGenerator:
             tooth_mask_np[h_start:h_end, w_start:w_end] = 255
             tooth_mask = Image.fromarray(tooth_mask_np, mode="L")
         else:
-            tooth_mask = self.refine_tooth_mask(tooth_mask)
-            tooth_mask = Image.fromarray(cv2.erode(np.array(tooth_mask), np.ones((8,8), np.uint8), iterations=1), mode="L")
+            # Reduced erosion kernel from 8x8 to 4x4 to preserve more tooth area
+            tooth_mask = self.refine_tooth_mask(tooth_mask, erosion_px=4)
+            tooth_mask = Image.fromarray(cv2.erode(np.array(tooth_mask), np.ones((4,4), np.uint8), iterations=1), mode="L")
 
         mask_np = np.array(tooth_mask)
         h, w = mask_np.shape
@@ -314,7 +315,8 @@ class VeneerControlNetGenerator:
         gate = np.ones_like(mask_np, dtype=np.uint8) * 255
         mask_np = cv2.bitwise_and(mask_np, gate)
         #mask_np = cv2.GaussianBlur(mask_np, (5, 5), 0)
-        mask_np = self.advanced_feather_mask(tooth_mask, inner_feather_px=10, outer_feather_px=35)
+        # Reduced inner feathering from 10 to 5 for stronger tooth modification
+        mask_np = self.advanced_feather_mask(tooth_mask, inner_feather_px=5, outer_feather_px=35)
         tooth_mask = Image.fromarray(mask_np, mode="L")
 
         if debug_dir:
@@ -328,7 +330,8 @@ class VeneerControlNetGenerator:
         
         sd_crop_mask = crop_mask.resize((GEN_SIZE, GEN_SIZE), Image.LANCZOS)
         mask_np = np.array(sd_crop_mask)
-        kernel = np.ones((6,6), np.uint8)
+        # Reduced erosion to preserve more tooth area for modification
+        kernel = np.ones((3,3), np.uint8)
         mask_np = cv2.erode(mask_np, kernel, iterations=1)
         sd_crop_mask = Image.fromarray(mask_np, mode="L")
 
@@ -375,7 +378,7 @@ class VeneerControlNetGenerator:
             num_inference_steps=40,
             guidance_scale=4.0,
             controlnet_conditioning_scale=0.6,
-            strength=0.2
+            strength=0.45  # Increased from 0.2 to allow more tooth modification
         )
 
         generated_sd = output.images[0]
