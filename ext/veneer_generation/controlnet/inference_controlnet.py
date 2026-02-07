@@ -174,6 +174,8 @@ class VeneerControlNetGenerator:
             edges = self.generate_edge_map(image)
             edges_np = np.array(edges)
             mask_np = np.array(mask)
+            if mask_np.ndim == 3:
+                mask_np = mask_np[..., 0] 
             edges_np[~mask_np] = 0
             edges = Image.fromarray(edges_np, mode='L')
 
@@ -325,28 +327,32 @@ class VeneerControlNetGenerator:
 
         offset = (x1, y1)
         crop_img, crop_mask = image, tooth_mask
-        cropped_w, cropped_h = crop_img.size
-        sd_crop_img = crop_img.resize((GEN_SIZE, GEN_SIZE), Image.LANCZOS)
-        
-        sd_crop_mask = crop_mask.resize((GEN_SIZE, GEN_SIZE), Image.LANCZOS)
-        mask_np = np.array(sd_crop_mask)
-        # Reduced erosion to preserve more tooth area for modification
-        kernel = np.ones((3,3), np.uint8)
-        mask_np = cv2.erode(mask_np, kernel, iterations=1)
-        sd_crop_mask = Image.fromarray(mask_np, mode="L")
 
-        if debug_dir:
-            sd_crop_img.save(Path(debug_dir) / 'cropped.png')
-        
-        #generate edges only on the cropped region
+        sd_crop_img = crop_img.resize((GEN_SIZE, GEN_SIZE), Image.LANCZOS)
+        sd_crop_mask = crop_mask.resize((GEN_SIZE, GEN_SIZE), Image.NEAREST)
+
+        mask_np = np.array(sd_crop_mask)
+
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3,3))
+        mask_np = cv2.erode(mask_np, kernel, iterations=1)
+
+        mask_bin = (mask_np > 0).astype(np.uint8)
+
+        dist = cv2.distanceTransform(mask_bin, cv2.DIST_L2, 5)
+        dist_norm = np.clip(dist / 16.0, 0, 1) * 255
+        dist_norm = dist_norm.astype(np.uint8)
+
         edges = self.generate_edge_map(sd_crop_img)
         edges_np = np.array(edges)
-        edges_np[np.array(sd_crop_mask) == 0] = 0
-        conditioning = np.stack([
-            edges_np,
-            edges_np,
-            edges_np
-        ], axis=-1)
+        edges_np = edges_np * mask_bin
+
+        defect_region = (dist < 5) & (mask_bin == 1)
+        edges_np[defect_region] = 0
+
+        conditioning = np.stack(
+            [mask_np, edges_np, dist_norm],
+            axis=-1
+        )
 
         conditioning_image = Image.fromarray(conditioning)
 
@@ -361,7 +367,7 @@ class VeneerControlNetGenerator:
             prompt = """perfect white dental veneers, bright uniform teeth,
                         perfectly aligned straight teeth, natural enamel texture,
                         professional teeth whitening, pristine dental work,
-                        flawless smile, symmetrical teeth, photorealistic"""
+                        flawless smile, perfectly symmetrical teeth, photorealistic"""
         if negative_prompt is None:
             negative_prompt = """yellow teeth, stained teeth, crooked teeth, misaligned teeth,
                                 plastic teeth, fake smile, porcelain doll, sharp edges,
