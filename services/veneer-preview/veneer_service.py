@@ -2,7 +2,8 @@
 Unified Veneer Preview Service
 
 This service provides a single interface for veneer preview generation with
-- ControlNet (recommended for geometric + color changes)
+- SDXL (recommended - best quality, preserves identity)
+- ControlNet (legacy - geometric + color changes)
 - Pix2pix (fast baseline for cosmetic changes only)
 
 The service handles:
@@ -19,6 +20,7 @@ from pathlib import Path
 from PIL import Image
 import torch
 import numpy as np
+import cv2
 import logging
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / 'ext' / 'veneer_generation'))
@@ -30,13 +32,15 @@ class VeneerPreviewService:
     Supports multiple model backends with a consistent interface.
     """
 
-    def __init__(self, model_type='pix2pix', **model_config):
+    def __init__(self, model_type='sdxl', **model_config):
         """
         Initialize the veneer preview service.
 
         Args:
-            model_type: Type of model to use ('controlnet' or 'pix2pix')
+            model_type: Type of model to use ('sdxl', 'controlnet', or 'pix2pix')
             **model_config: Model-specific configuration
+                For SDXL (recommended):
+                    - No required config, uses stabilityai/stable-diffusion-xl-base-1.0
                 For ControlNet:
                     - controlnet_path: Path to ControlNet weights
                     - base_model_path: Path to Stable Diffusion base
@@ -63,12 +67,21 @@ class VeneerPreviewService:
         Args:
             config: Model-specific configuration dictionary
         """
-        if self.model_type == 'controlnet':
+        if self.model_type == 'sdxl':
+            self._init_sdxl(config)
+        elif self.model_type == 'controlnet':
             self._init_controlnet(config)
         elif self.model_type == 'pix2pix':
             self._init_pix2pix(config)
         else:
             raise ValueError(f"Unknown model type: {self.model_type}")
+
+    def _init_sdxl(self, config):
+        """Initialize SDXL inpainting generator (recommended)."""
+        from controlnet.veneer_generator_simple import SimpleVeneerGenerator
+
+        self.generator = SimpleVeneerGenerator(device=str(self.device))
+        print("✓ SDXL generator initialized")
 
     def _init_controlnet(self, config):
         """Initialize ControlNet generator."""
@@ -128,12 +141,94 @@ class VeneerPreviewService:
         Returns:
             PIL Image of veneer preview
         """
-        if self.model_type == 'controlnet':
+        if self.model_type == 'sdxl':
+            return self._generate_sdxl(
+                image, intensity, bounding_box, **kwargs
+            )
+        elif self.model_type == 'controlnet':
             return self._generate_controlnet(
                 image, intensity, preserve_geometry, custom_prompt, bounding_box, **kwargs
             )
         elif self.model_type == 'pix2pix':
             return self._generate_pix2pix(image, intensity, **kwargs)
+
+    def _create_mouth_mask(self, image, bounding_box=None):
+        """
+        Create a mask for the mouth/teeth region.
+
+        Args:
+            image: PIL Image
+            bounding_box: Optional dict with x, y, width, height (percentages)
+
+        Returns:
+            PIL Image mask (white = teeth area)
+        """
+        w, h = image.size
+
+        if bounding_box:
+            # Use provided bounding box
+            x = int(bounding_box['x'] / 100.0 * w)
+            y = int(bounding_box['y'] / 100.0 * h)
+            bw = int(bounding_box['width'] / 100.0 * w)
+            bh = int(bounding_box['height'] / 100.0 * h)
+        else:
+            # Default: assume mouth is in lower-center of image
+            # Typical portrait: mouth at 55-75% height, 25-75% width
+            x = int(w * 0.25)
+            y = int(h * 0.55)
+            bw = int(w * 0.50)
+            bh = int(h * 0.20)
+
+        # Create mask
+        mask = np.zeros((h, w), dtype=np.uint8)
+        mask[y:y+bh, x:x+bw] = 255
+
+        return Image.fromarray(mask, mode='L')
+
+    def _generate_sdxl(self, image, intensity, bounding_box, **kwargs):
+        """
+        Generate veneer preview using SDXL inpainting.
+
+        Args:
+            image: PIL Image
+            intensity: Controls strength (0-1)
+            bounding_box: Mouth region coordinates
+            **kwargs: Additional arguments
+
+        Returns:
+            PIL Image with veneer preview
+        """
+        import tempfile
+        import os
+
+        # Create temporary files for the simple generator
+        with tempfile.TemporaryDirectory() as tmpdir:
+            input_path = os.path.join(tmpdir, 'input.png')
+            mask_path = os.path.join(tmpdir, 'mask.png')
+            output_path = os.path.join(tmpdir, 'output.png')
+
+            # Save input image
+            image.save(input_path)
+
+            # Create and save mask
+            mask = self._create_mouth_mask(image, bounding_box)
+            mask.save(mask_path)
+
+            # Map intensity to strength (0.5-0.9 range works well)
+            strength = 0.5 + (intensity * 0.4)
+
+            # Generate
+            result = self.generator.generate(
+                image_path=input_path,
+                mask_path=mask_path,
+                output_path=output_path,
+                strength=strength,
+                guidance_scale=kwargs.get('guidance_scale', 7.5),
+                num_inference_steps=kwargs.get('steps', 30),
+                seed=kwargs.get('seed', None)
+            )
+
+            return result
 
     def _generate_controlnet(
         self,
@@ -144,13 +239,12 @@ class VeneerPreviewService:
         bounding_box,
         **kwargs
     ):
-        # Lower guidance to reduce hallucinations and distortion
-        if preserve_geometry:
-            controlnet_scale = 1.2
-            guidance_scale = 3.5
-        else:
-            controlnet_scale = 0.9
-            guidance_scale = 3.5
+        # Use recommended defaults from inference_controlnet.py
+        # Allow override via kwargs, otherwise use tuned defaults
+        controlnet_scale = kwargs.get('controlnet_conditioning_scale', 0.45)
+        guidance_scale = kwargs.get('guidance_scale', 7.5)
+        steps = kwargs.get('steps', 30)
+        strength = kwargs.get('strength', 0.80)
 
         if custom_prompt is None:
             if preserve_geometry:
@@ -172,9 +266,10 @@ class VeneerPreviewService:
         result = self.generator.generate_veneer_preview(
             image=image,
             prompt=prompt,
-            num_inference_steps=kwargs.get('steps', 35),
+            num_inference_steps=steps,
             guidance_scale=guidance_scale,
             controlnet_conditioning_scale=controlnet_scale,
+            strength=strength,
             seed=kwargs.get('seed', None),
             debug_dir=str(debug_dir),
             bounding_box=bounding_box
@@ -236,10 +331,10 @@ class VeneerPreviewService:
             if return_format == 'pil':
                 return preview
             buffer = io.BytesIO()
-            preview.save(buffer, format='JPEG', quality=95)
+            preview.save(buffer, format='PNG', optimize=False)
             preview_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
 
-            return f"data:image/jpeg;base64,{preview_base64}"
+            return f"data:image/png;base64,{preview_base64}"
 
         except Exception as e:
             raise Exception(f"Error generating veneer preview: {str(e)}")
@@ -281,12 +376,12 @@ class VeneerPreviewService:
 _veneer_service = None
 
 
-def get_veneer_service(model_type='controlnet', force_reload=False, **config):
+def get_veneer_service(model_type='sdxl', force_reload=False, **config):
     """
     Get singleton instance of veneer service.
 
     Args:
-        model_type: Type of model ('controlnet' or 'pix2pix')
+        model_type: Type of model ('sdxl', 'controlnet', or 'pix2pix')
         force_reload: Force reload of service
         **config: Model configuration
 
@@ -311,7 +406,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--image', type=str, required=True, help='Input image path')
     parser.add_argument('--output', type=str, required=True, help='Output path')
-    parser.add_argument('--model', type=str, default='controlnet', choices=['controlnet', 'pix2pix'])
+    parser.add_argument('--model', type=str, default='sdxl', choices=['sdxl', 'controlnet', 'pix2pix'])
     parser.add_argument('--controlnet-path', type=str, help='Path to ControlNet weights')
     parser.add_argument('--segmentation', type=str, help='Path to segmentation checkpoint')
     parser.add_argument('--intensity', type=float, default=0.8, help='Transformation intensity')
@@ -320,7 +415,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Configure service
-    if args.model == 'controlnet':
+    if args.model == 'sdxl':
+        config = {}  # SDXL needs no special config
+    elif args.model == 'controlnet':
         config = {
             'controlnet_path': args.controlnet_path,
             'segmentation_checkpoint': args.segmentation

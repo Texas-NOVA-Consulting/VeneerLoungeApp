@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     }
 
     const controller = new AbortController()
-    setTimeout(() => controller.abort(), 180000)
+    setTimeout(() => controller.abort(), 600000) // 10 minutes timeout
     const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
 
     const response = await fetch(`${backendUrl}/api/veneer-preview`, {
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 export const config = {
   api: {
     bodyParser: {
-      sizeLimit: "10mb",
+      sizeLimit: "50mb",
     },
   },
 }
