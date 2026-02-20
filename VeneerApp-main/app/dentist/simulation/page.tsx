@@ -49,6 +49,9 @@ export default function DentistSimulationPage() {
     }
     setIsGenerating(true)
     try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 600000) // 10 min timeout
+
       const response = await fetch("/api/simulate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -58,7 +61,10 @@ export default function DentistSimulationPage() {
           numOutputs: numVariations,
           boundingBox: boundingBox,
         }),
+        signal: controller.signal,
       })
+
+      clearTimeout(timeoutId)
 
       const data = await response.json()
 

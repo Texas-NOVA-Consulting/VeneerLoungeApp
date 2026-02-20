@@ -16,6 +16,7 @@ The service handles:
 import base64
 import io
 import sys
+import threading
 from pathlib import Path
 from PIL import Image
 import torch
@@ -56,6 +57,7 @@ class VeneerPreviewService:
         self.model_type = model_type
         self.generator = None
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self._pipeline_lock = threading.Lock()
 
         self.seg_model = None
 
@@ -215,9 +217,17 @@ class VeneerPreviewService:
             bh = int(bounding_box['height'] / 100.0 * h)
         else:
             x = int(w * 0.25)
-            y = int(h * 0.55)
+            y = int(h * 0.50)
             bw = int(w * 0.50)
-            bh = int(h * 0.20)
+            bh = int(h * 0.30)
+
+        # Expand bounding box vertically to ensure both upper and lower
+        # teeth are captured. Add 30% padding above and 40% below since
+        # users tend to draw boxes around the upper teeth only.
+        pad_top = int(bh * 0.3)
+        pad_bottom = int(bh * 0.4)
+        y = y - pad_top
+        bh = bh + pad_top + pad_bottom
 
         # Clamp to image bounds
         x = max(0, min(x, w - 1))
@@ -340,6 +350,8 @@ class VeneerPreviewService:
         original photo so only the teeth region changes — no rectangular
         boundary artifacts.
 
+        Saves debug images at each step to debug_outputs/sdxl_pipeline/.
+
         Args:
             image: PIL Image
             intensity: Controls strength (0-1)
@@ -349,28 +361,52 @@ class VeneerPreviewService:
         Returns:
             PIL Image with veneer preview
         """
-        # Create mask from bounding box (teeth detection, not a rectangle)
+        import time
+        debug_dir = Path(__file__).parent.parent.parent / 'debug_outputs' / 'sdxl_pipeline'
+        debug_dir.mkdir(parents=True, exist_ok=True)
+        t0 = time.time()
+
+        # Step 1: Save input
+        image.save(debug_dir / '01_input.png')
+        print(f"  [debug] 01_input saved ({image.size[0]}x{image.size[1]})")
+
+        # Step 2: Create mask from bounding box (teeth detection)
         mask = self._create_mouth_mask(image, bounding_box)
+        mask.save(debug_dir / '02_teeth_mask.png')
+        mask_np = np.array(mask)
+        pct = np.sum(mask_np > 0) / mask_np.size * 100
+        print(f"  [debug] 02_teeth_mask saved (coverage: {pct:.1f}%, min={mask_np.min()}, max={mask_np.max()})")
 
-        # Use strength directly — matches CLI default of 0.75
+        # Step 3: Save mask overlay on input for visual check
+        overlay = np.array(image).copy()
+        overlay[mask_np > 0] = [255, 0, 0]  # Red overlay on teeth
+        blended_overlay = (np.array(image).astype(float) * 0.6 + overlay.astype(float) * 0.4).astype(np.uint8)
+        Image.fromarray(blended_overlay).save(debug_dir / '03_mask_overlay.png')
+        print(f"  [debug] 03_mask_overlay saved")
+
+        # Step 4: Run SDXL inpainting (lock prevents concurrent scheduler corruption)
         strength = intensity
+        t1 = time.time()
+        print(f"  [debug] Starting SDXL inpainting (strength={strength})...")
+        with self._pipeline_lock:
+            result = self.generator.generate_from_pil(
+                image=image,
+                mask=mask,
+                strength=strength,
+                guidance_scale=kwargs.get('guidance_scale', 7.5),
+                num_inference_steps=kwargs.get('steps', 30),
+                seed=kwargs.get('seed', None)
+            )
+        t2 = time.time()
+        result.save(debug_dir / '04_sdxl_raw_output.png')
+        print(f"  [debug] 04_sdxl_raw_output saved ({t2 - t1:.1f}s)")
 
-        # Run SDXL inpainting (internally applies 51x51 Gaussian blur to mask)
-        result = self.generator.generate_from_pil(
-            image=image,
-            mask=mask,
-            strength=strength,
-            guidance_scale=kwargs.get('guidance_scale', 7.5),
-            num_inference_steps=kwargs.get('steps', 30),
-            seed=kwargs.get('seed', None)
-        )
+        # Step 5: Alpha-composite onto original
+        final = self._composite_result(image, result, mask)
+        final.save(debug_dir / '05_final_composited.png')
+        print(f"  [debug] 05_final_composited saved (total: {time.time() - t0:.1f}s)")
 
-        # Alpha-composite SDXL result onto original using the teeth mask.
-        # This eliminates the visible rectangular patch: only teeth pixels
-        # come from SDXL, everything else stays as the original photo.
-        result = self._composite_result(image, result, mask)
-
-        return result
+        return final
 
     def _composite_result(self, original, generated, mask):
         """
