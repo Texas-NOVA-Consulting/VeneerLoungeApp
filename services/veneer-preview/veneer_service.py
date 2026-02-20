@@ -24,6 +24,10 @@ import cv2
 import logging
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / 'ext' / 'veneer_generation'))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / 'ext' / 'individual_tooth_segmentation'))
+
+# Segmentation model checkpoint path
+_SEG_CHECKPOINT = Path(__file__).parent.parent.parent / 'ext' / 'individual_tooth_segmentation' / 'checkpoints' / 'CP_teeth_seg.pth'
 
 
 class VeneerPreviewService:
@@ -53,9 +57,14 @@ class VeneerPreviewService:
         self.generator = None
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+        self.seg_model = None
+
         print(f"Initializing Veneer Preview Service...")
         print(f"  Model type: {model_type}")
         print(f"  Device: {self.device}")
+
+        # Load tooth segmentation model for mask generation
+        self._load_segmentation_model()
 
         # Initialize the appropriate model
         self._initialize_generator(model_config)
@@ -75,6 +84,38 @@ class VeneerPreviewService:
             self._init_pix2pix(config)
         else:
             raise ValueError(f"Unknown model type: {self.model_type}")
+
+    def _load_segmentation_model(self):
+        """Load the ResNeSt50 tooth segmentation model for precise mask generation."""
+        if not _SEG_CHECKPOINT.exists():
+            print(f"⚠ Segmentation checkpoint not found at {_SEG_CHECKPOINT}, falling back to HSV")
+            return
+
+        try:
+            from src.network.model import ResNeSt50_TC
+
+            self.seg_model = ResNeSt50_TC(in_ch=3, out_ch=1)
+            checkpoint = torch.load(str(_SEG_CHECKPOINT), map_location=self.device)
+
+            # Handle multiple checkpoint formats (same as inference_controlnet.py)
+            if 'model_state_dict' in checkpoint:
+                state_dict = checkpoint['model_state_dict']
+            elif 'net_state_dict' in checkpoint:
+                state_dict = checkpoint['net_state_dict']
+            else:
+                state_dict = checkpoint
+
+            # Strip DataParallel 'module.' prefix if present
+            if any(k.startswith('module.') for k in state_dict.keys()):
+                state_dict = {k.replace('module.', ''): v for k, v in state_dict.items()}
+
+            self.seg_model.load_state_dict(state_dict)
+            self.seg_model.to(self.device)
+            self.seg_model.eval()
+            print("✓ Tooth segmentation model loaded")
+        except Exception as e:
+            print(f"⚠ Failed to load segmentation model: {e}, falling back to HSV")
+            self.seg_model = None
 
     def _init_sdxl(self, config):
         """Initialize SDXL inpainting generator (recommended)."""
@@ -154,7 +195,9 @@ class VeneerPreviewService:
 
     def _create_mouth_mask(self, image, bounding_box=None):
         """
-        Create a mask for the mouth/teeth region.
+        Create a mask for the mouth/teeth region using the neural network
+        segmentation model (ResNeSt50). Falls back to HSV thresholding if
+        the segmentation model is not available.
 
         Args:
             image: PIL Image
@@ -166,28 +209,136 @@ class VeneerPreviewService:
         w, h = image.size
 
         if bounding_box:
-            # Use provided bounding box
             x = int(bounding_box['x'] / 100.0 * w)
             y = int(bounding_box['y'] / 100.0 * h)
             bw = int(bounding_box['width'] / 100.0 * w)
             bh = int(bounding_box['height'] / 100.0 * h)
         else:
-            # Default: assume mouth is in lower-center of image
-            # Typical portrait: mouth at 55-75% height, 25-75% width
             x = int(w * 0.25)
             y = int(h * 0.55)
             bw = int(w * 0.50)
             bh = int(h * 0.20)
 
-        # Create mask
+        # Clamp to image bounds
+        x = max(0, min(x, w - 1))
+        y = max(0, min(y, h - 1))
+        bw = min(bw, w - x)
+        bh = min(bh, h - y)
+
+        img_np = np.array(image)
+        crop = img_np[y:y+bh, x:x+bw]
+
+        if self.seg_model is not None:
+            teeth_mask_crop = self._segment_teeth_nn(crop)
+            print("  Mask generated via neural network segmentation")
+        else:
+            teeth_mask_crop = self._segment_teeth_hsv(crop)
+            print("  Mask generated via HSV fallback")
+
+        # Place teeth mask into full-size mask
         mask = np.zeros((h, w), dtype=np.uint8)
-        mask[y:y+bh, x:x+bw] = 255
+        mask[y:y+bh, x:x+bw] = teeth_mask_crop
+
+        # Light dilation so SDXL has room to blend at edges
+        dilate_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+        mask = cv2.dilate(mask, dilate_kernel, iterations=1)
+
+        # Save debug mask
+        debug_dir = Path(__file__).parent.parent.parent / 'debug_outputs'
+        debug_dir.mkdir(exist_ok=True)
+        Image.fromarray(mask, mode='L').save(debug_dir / 'auto_mask.png')
 
         return Image.fromarray(mask, mode='L')
+
+    def _segment_teeth_nn(self, crop_np):
+        """
+        Run neural network tooth segmentation on a cropped mouth region.
+
+        Args:
+            crop_np: numpy array (H, W, 3) RGB crop of mouth region
+
+        Returns:
+            numpy array (H, W) uint8 binary mask (255 = teeth)
+        """
+        crop_h, crop_w = crop_np.shape[:2]
+
+        # Pad to multiple of 32 for the model
+        pad_h = (32 - crop_h % 32) % 32
+        pad_w = (32 - crop_w % 32) % 32
+        if pad_h > 0 or pad_w > 0:
+            crop_padded = np.pad(
+                crop_np,
+                ((pad_h // 2, pad_h - pad_h // 2),
+                 (pad_w // 2, pad_w - pad_w // 2),
+                 (0, 0)),
+                mode='reflect'
+            )
+        else:
+            crop_padded = crop_np
+
+        # Preprocess: HWC -> CHW, normalize to [0, 1]
+        img_tensor = torch.from_numpy(crop_padded).permute(2, 0, 1).float()
+        img_tensor = img_tensor.unsqueeze(0) / 255.0
+        img_tensor = img_tensor.to(self.device)
+
+        # Inference
+        with torch.no_grad():
+            output = self.seg_model(img_tensor)
+            prob = torch.sigmoid(output).squeeze().cpu().numpy()
+
+        # Remove padding
+        if pad_h > 0 or pad_w > 0:
+            ph = pad_h // 2
+            pw = pad_w // 2
+            prob = prob[ph:ph + crop_h, pw:pw + crop_w]
+
+        # Binary threshold
+        mask = (prob > 0.5).astype(np.uint8) * 255
+
+        # Light morphological cleanup
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=1)
+
+        return mask
+
+    def _segment_teeth_hsv(self, crop_np):
+        """
+        Fallback HSV-based teeth detection (used when segmentation model unavailable).
+
+        Args:
+            crop_np: numpy array (H, W, 3) RGB crop of mouth region
+
+        Returns:
+            numpy array (H, W) uint8 binary mask (255 = teeth)
+        """
+        crop_h, crop_w = crop_np.shape[:2]
+        crop_hsv = cv2.cvtColor(crop_np, cv2.COLOR_RGB2HSV)
+
+        lower = np.array([0, 0, 150])
+        upper = np.array([180, 60, 255])
+        teeth_mask = cv2.inRange(crop_hsv, lower, upper)
+
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+        teeth_mask = cv2.morphologyEx(teeth_mask, cv2.MORPH_CLOSE, kernel, iterations=2)
+        teeth_mask = cv2.morphologyEx(teeth_mask, cv2.MORPH_OPEN, kernel, iterations=1)
+
+        # Ellipse fallback if very few teeth pixels detected
+        teeth_pixels = np.sum(teeth_mask > 0)
+        total_pixels = crop_w * crop_h
+        if total_pixels > 0 and teeth_pixels / total_pixels < 0.05:
+            teeth_mask = np.zeros((crop_h, crop_w), dtype=np.uint8)
+            center = (crop_w // 2, crop_h // 2)
+            axes = (crop_w // 2, crop_h // 2)
+            cv2.ellipse(teeth_mask, center, axes, 0, 0, 360, 255, -1)
+
+        return teeth_mask
 
     def _generate_sdxl(self, image, intensity, bounding_box, **kwargs):
         """
         Generate veneer preview using SDXL inpainting.
+        After SDXL generates teeth, composites the result back onto the
+        original photo so only the teeth region changes — no rectangular
+        boundary artifacts.
 
         Args:
             image: PIL Image
@@ -198,37 +349,54 @@ class VeneerPreviewService:
         Returns:
             PIL Image with veneer preview
         """
-        import tempfile
-        import os
+        # Create mask from bounding box (teeth detection, not a rectangle)
+        mask = self._create_mouth_mask(image, bounding_box)
 
-        # Create temporary files for the simple generator
-        with tempfile.TemporaryDirectory() as tmpdir:
-            input_path = os.path.join(tmpdir, 'input.png')
-            mask_path = os.path.join(tmpdir, 'mask.png')
-            output_path = os.path.join(tmpdir, 'output.png')
+        # Use strength directly — matches CLI default of 0.75
+        strength = intensity
 
-            # Save input image
-            image.save(input_path)
+        # Run SDXL inpainting (internally applies 51x51 Gaussian blur to mask)
+        result = self.generator.generate_from_pil(
+            image=image,
+            mask=mask,
+            strength=strength,
+            guidance_scale=kwargs.get('guidance_scale', 7.5),
+            num_inference_steps=kwargs.get('steps', 30),
+            seed=kwargs.get('seed', None)
+        )
 
-            # Create and save mask
-            mask = self._create_mouth_mask(image, bounding_box)
-            mask.save(mask_path)
+        # Alpha-composite SDXL result onto original using the teeth mask.
+        # This eliminates the visible rectangular patch: only teeth pixels
+        # come from SDXL, everything else stays as the original photo.
+        result = self._composite_result(image, result, mask)
 
-            # Map intensity to strength (0.5-0.9 range works well)
-            strength = 0.5 + (intensity * 0.4)
+        return result
 
-            # Generate
-            result = self.generator.generate(
-                image_path=input_path,
-                mask_path=mask_path,
-                output_path=output_path,
-                strength=strength,
-                guidance_scale=kwargs.get('guidance_scale', 7.5),
-                num_inference_steps=kwargs.get('steps', 30),
-                seed=kwargs.get('seed', None)
-            )
+    def _composite_result(self, original, generated, mask):
+        """
+        Blend the SDXL-generated image onto the original using a feathered
+        version of the teeth mask. This prevents rectangular boundary
+        artifacts by ensuring only the teeth region is replaced.
 
-            return result
+        Args:
+            original: PIL Image (original photo)
+            generated: PIL Image (SDXL output)
+            mask: PIL Image (L mode, teeth mask)
+
+        Returns:
+            PIL Image with seamless blend
+        """
+        # Feather the mask for smooth transition at boundaries
+        mask_np = np.array(mask).astype(np.float32) / 255.0
+        alpha = cv2.GaussianBlur(mask_np, (31, 31), 0)
+        alpha = np.stack([alpha] * 3, axis=-1)
+
+        orig_np = np.array(original).astype(np.float32)
+        gen_np = np.array(generated).astype(np.float32)
+
+        # Alpha blend: keep original everywhere except teeth
+        blended = orig_np * (1.0 - alpha) + gen_np * alpha
+        return Image.fromarray(blended.astype(np.uint8))
 
     def _generate_controlnet(
         self,

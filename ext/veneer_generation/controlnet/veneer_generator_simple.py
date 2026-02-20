@@ -28,8 +28,9 @@ class SimpleVeneerGenerator:
         dtype = torch.float16 if self.device.type == 'cuda' else torch.float32
 
         print("Loading SDXL Inpainting pipeline...")
+        # Use the actual SDXL inpainting model, not the base model
         self.pipe = StableDiffusionXLInpaintPipeline.from_pretrained(
-            "stabilityai/stable-diffusion-xl-base-1.0",
+            "diffusers/stable-diffusion-xl-1.0-inpainting-0.1",
             torch_dtype=dtype,
             variant="fp16" if dtype == torch.float16 else None,
         ).to(self.device)
@@ -39,35 +40,25 @@ class SimpleVeneerGenerator:
 
         print("✓ SimpleVeneerGenerator initialized")
 
-    def generate(
-        self,
-        image_path,
-        mask_path,
-        output_path,
-        strength=0.75,
-        guidance_scale=7.5,
-        num_inference_steps=30,
-        seed=None,
-    ):
+    def _prepare_inputs(self, image, mask):
         """
-        Generate veneer preview.
+        Prepare image and mask for SDXL pipeline.
+        This is the EXACT same preprocessing for both CLI and API paths.
 
         Args:
-            image_path: Path to input image
-            mask_path: Path to mask image (white = teeth area to modify)
-            output_path: Path to save output
-            strength: Denoising strength (lower = less change, preserves more)
-            guidance_scale: CFG scale
-            num_inference_steps: Number of diffusion steps
-            seed: Random seed
-        """
-        # Load image and mask
-        image = Image.open(image_path).convert("RGB")
-        mask = Image.open(mask_path).convert("L")
+            image: PIL Image (RGB)
+            mask: PIL Image (L mode, white = area to modify)
 
+        Returns:
+            (image_resized, mask_resized, orig_size)
+        """
         orig_size = image.size
         print(f"Original image size: {orig_size}")
         print(f"Mask size: {mask.size}")
+
+        # Ensure mask matches image size
+        if mask.size != image.size:
+            mask = mask.resize(image.size, Image.LANCZOS)
 
         # Resize to SDXL-friendly size (must be multiple of 8)
         # Keep aspect ratio, fit within 1024x1024
@@ -82,10 +73,18 @@ class SimpleVeneerGenerator:
         print(f"Resized to: {new_w}x{new_h}")
 
         # Feather the mask edges for smooth blending
+        # Use large kernel for gradual transition
         mask_np = np.array(mask_resized)
-        mask_np = cv2.GaussianBlur(mask_np, (21, 21), 0)
+        mask_np = cv2.GaussianBlur(mask_np, (51, 51), 0)
         mask_resized = Image.fromarray(mask_np)
 
+        return image_resized, mask_resized, orig_size
+
+    def _run_pipeline(self, image_resized, mask_resized, strength, guidance_scale, num_inference_steps, seed):
+        """
+        Run the SDXL inpainting pipeline.
+        This is the EXACT same inference for both CLI and API paths.
+        """
         # Setup generator
         generator = None
         if seed is not None:
@@ -111,10 +110,57 @@ class SimpleVeneerGenerator:
             generator=generator
         )
 
-        result = output.images[0]
+        return output.images[0]
+
+    def generate_from_pil(
+        self,
+        image,
+        mask,
+        strength=0.75,
+        guidance_scale=7.5,
+        num_inference_steps=30,
+        seed=None,
+    ):
+        """
+        Generate veneer preview from PIL images.
+        This is the method the API service should call.
+
+        Args:
+            image: PIL Image (RGB)
+            mask: PIL Image (L mode, white = teeth area to modify)
+            strength: Denoising strength
+            guidance_scale: CFG scale
+            num_inference_steps: Number of diffusion steps
+            seed: Random seed
+
+        Returns:
+            PIL Image result
+        """
+        image_resized, mask_resized, orig_size = self._prepare_inputs(image, mask)
+        result = self._run_pipeline(image_resized, mask_resized, strength, guidance_scale, num_inference_steps, seed)
 
         # Resize back to original size
         result = result.resize(orig_size, Image.LANCZOS)
+        return result
+
+    def generate(
+        self,
+        image_path,
+        mask_path,
+        output_path,
+        strength=0.75,
+        guidance_scale=7.5,
+        num_inference_steps=30,
+        seed=None,
+    ):
+        """
+        Generate veneer preview from file paths (CLI usage).
+        Uses the exact same pipeline as generate_from_pil.
+        """
+        image = Image.open(image_path).convert("RGB")
+        mask = Image.open(mask_path).convert("L")
+
+        result = self.generate_from_pil(image, mask, strength, guidance_scale, num_inference_steps, seed)
 
         # Save
         result.save(output_path, quality=95)

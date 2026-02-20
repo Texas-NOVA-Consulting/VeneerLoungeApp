@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
       headers: {"Content-Type" : "application/json" },
       body: JSON.stringify({
         image: image,
-        intensity: 0.8,
+        intensity: 0.75,
         preserve_geometry: true,
         bounding_box: boundingBox,
       }),
